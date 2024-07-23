@@ -19,8 +19,8 @@ type Game struct {
 func (game *Game) Init() {
 	game.board = board.NewBoard()
 	game.controlsInfo = addons.NewInfo(
-		"D - Next move, A - Previous move",
-		rl.NewVector2(225, 810),
+		"A - Previous move, D - Next move\nArrows - Move board",
+		rl.NewVector2(10, 815),
 	)
 	game.ctr = 0
 
@@ -32,6 +32,10 @@ func (game *Game) Update(nextMove bool) {
 	} else {
 		game.board.PreviousMove()
 	}
+}
+
+func (game *Game) MoveBoard(direction rl.Vector2) {
+	game.board.MoveBoard(direction)
 }
 
 func (game *Game) Draw() {

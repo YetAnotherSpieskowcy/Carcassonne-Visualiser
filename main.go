@@ -8,7 +8,7 @@ import (
 
 const (
 	screenWidth  = 800
-	screenHeight = 850
+	screenHeight = 875
 )
 
 func main() {
@@ -19,10 +19,19 @@ func main() {
 
 	for !rl.WindowShouldClose() {
 		key := rl.GetKeyPressed()
-		if key == rl.KeyD {
+		switch key {
+		case rl.KeyD:
 			game.Update(true)
-		} else if key == rl.KeyA {
+		case rl.KeyA:
 			game.Update(false)
+		case rl.KeyLeft:
+			game.MoveBoard(rl.NewVector2(-1, 0))
+		case rl.KeyRight:
+			game.MoveBoard(rl.NewVector2(1, 0))
+		case rl.KeyUp:
+			game.MoveBoard(rl.NewVector2(0, -1))
+		case rl.KeyDown:
+			game.MoveBoard(rl.NewVector2(0, 1))
 		}
 		game.Draw()
 	}

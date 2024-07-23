@@ -6,14 +6,17 @@ import (
 )
 
 const (
-	tileSize  = 60
-	boardSize = 800
-	offset    = boardSize % tileSize
+	tileSize    = 60
+	boardSize   = 800
+	boardOffset = boardSize % tileSize
 )
 
 type Board struct {
 	screenWidth  int32
 	screenHeight int32
+	offset       rl.Vector2
+	minRange     rl.Vector2
+	maxRange     rl.Vector2
 
 	nextMoves []Tile
 	tiles     []Tile
@@ -30,13 +33,18 @@ func NewBoard() Board {
 	return Board{
 		screenWidth:  boardSize,
 		screenHeight: boardSize,
+		minRange:     rl.NewVector2(-6, -6),
+		maxRange:     rl.NewVector2(6, 6),
+		offset:       rl.NewVector2(0, 0),
 		nextMoves:    nextMoves,
 		tiles:        tiles,
 	}
 }
 
-func (board *Board) AddTile(tile Tile) {
-	board.tiles = append(board.tiles, tile)
+func (board *Board) MoveBoard(direction rl.Vector2) {
+	board.offset = rl.Vector2Add(board.offset, direction)
+	board.minRange = rl.Vector2Add(board.minRange, direction)
+	board.maxRange = rl.Vector2Add(board.maxRange, direction)
 }
 
 func (board *Board) NextMove() {
@@ -62,23 +70,27 @@ func (board Board) Draw() {
 	// Draw grid lines
 	for i := int32(0); i < board.screenWidth/tileSize+1; i++ {
 		rl.DrawLineV(
-			rl.NewVector2(float32(tileSize*i)+offset/2, offset/2),
-			rl.NewVector2(float32(tileSize*i)+offset/2, float32(board.screenHeight)-offset/2),
+			rl.NewVector2(float32(tileSize*i)+boardOffset/2, boardOffset/2),
+			rl.NewVector2(float32(tileSize*i)+boardOffset/2, float32(board.screenHeight)-boardOffset/2),
 			rl.LightGray,
 		)
 	}
 
 	for i := int32(0); i < board.screenHeight/tileSize+1; i++ {
 		rl.DrawLineV(
-			rl.NewVector2(offset/2, float32(tileSize*i)+offset/2),
-			rl.NewVector2(float32(board.screenWidth)-offset/2, float32(tileSize*i)+offset/2),
+			rl.NewVector2(boardOffset/2, float32(tileSize*i)+boardOffset/2),
+			rl.NewVector2(float32(board.screenWidth)-boardOffset/2, float32(tileSize*i)+boardOffset/2),
 			rl.LightGray,
 		)
 	}
 
 	// Draw tiles
 	for _, tile := range board.tiles {
-		tile.DrawTile()
+		// Draw tile only if it is visible
+		if tile.Position.X() >= int16(board.minRange.X) && tile.Position.X() <= int16(board.maxRange.X) &&
+			tile.Position.Y() >= int16(board.minRange.Y) && tile.Position.Y() <= int16(board.maxRange.Y) {
+			tile.DrawTile(board.offset)
+		}
 	}
 
 	rl.EndDrawing()
