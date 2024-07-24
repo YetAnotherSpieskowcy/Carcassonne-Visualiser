@@ -1,7 +1,6 @@
 package board
 
 import (
-	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/position"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -22,13 +21,11 @@ type Board struct {
 	tiles     []Tile
 }
 
-func NewBoard() Board {
+func NewBoard(startTile Tile) Board {
 	nextMoves := make([]Tile, 0)
-	nextMoves = append(nextMoves, ParsePlaceTileEntry(position.New(0, 1), rl.Blue))
-	nextMoves = append(nextMoves, ParsePlaceTileEntry(position.New(-6, 6), rl.Red))
 
 	tiles := make([]Tile, 0)
-	tiles = append(tiles, ParseStartEntry())
+	tiles = append(tiles, startTile)
 
 	return Board{
 		screenWidth:  boardSize,
@@ -43,16 +40,21 @@ func NewBoard() Board {
 
 func (board *Board) MoveBoard(direction rl.Vector2) {
 	board.offset = rl.Vector2Add(board.offset, direction)
-	board.minRange = rl.Vector2Add(board.minRange, direction)
-	board.maxRange = rl.Vector2Add(board.maxRange, direction)
+	board.minRange = rl.Vector2Subtract(board.minRange, direction)
+	board.maxRange = rl.Vector2Subtract(board.maxRange, direction)
 }
 
-func (board *Board) NextMove() {
+func (board *Board) NextMove(nextTile Tile, nextTilePlaced bool) bool {
 	if len(board.nextMoves) > 0 {
 		tileIndex := len(board.nextMoves) - 1
 		board.tiles = append(board.tiles, board.nextMoves[tileIndex])
 		board.nextMoves = board.nextMoves[:tileIndex]
+		return false
+	} else if !nextTilePlaced {
+		board.tiles = append(board.tiles, nextTile)
+		return true
 	}
+	return true
 }
 
 func (board *Board) PreviousMove() {

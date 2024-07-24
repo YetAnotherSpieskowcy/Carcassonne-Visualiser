@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"fmt"
+
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/logger"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/addons"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board"
@@ -11,24 +13,39 @@ type Game struct {
 	board        board.Board
 	controlsInfo addons.Info
 
-	logger logger.FileLogger
-
-	ctr uint8
+	logs           <-chan logger.Entry
+	nextTile       board.Tile
+	nextTilePlaced bool
 }
 
-func (game *Game) Init() {
-	game.board = board.NewBoard()
+func (game *Game) Init(filename string) {
+	fileLogger, _ := logger.NewFromFile(filename)
+
+	game.logs = fileLogger.ReadLogs()
+
+	game.board = board.NewBoard(board.ParseStartEntry(<-game.logs))
+	game.nextTile = board.ParsePlaceTileEntry(<-game.logs)
+	game.nextTilePlaced = false
+
 	game.controlsInfo = addons.NewInfo(
 		"A - Previous move, D - Next move\nArrows - Move board",
 		rl.NewVector2(10, 815),
 	)
-	game.ctr = 0
 
 }
 
 func (game *Game) Update(nextMove bool) {
 	if nextMove {
-		game.board.NextMove()
+		readNewEntry := game.board.NextMove(game.nextTile, game.nextTilePlaced)
+		if readNewEntry {
+			game.nextTilePlaced = true
+			val, ok := <-game.logs
+			if ok {
+				fmt.Println("reading new tile")
+				game.nextTile = board.ParsePlaceTileEntry(val)
+				game.nextTilePlaced = false
+			}
+		}
 	} else {
 		game.board.PreviousMove()
 	}
