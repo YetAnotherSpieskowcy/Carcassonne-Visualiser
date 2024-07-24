@@ -1,16 +1,14 @@
 package factory
 
 import (
-	"fmt"
-
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/tiles/side"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board/feature"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func Monastery() feature.Feature {
-	monasteryFeature := feature.New()
-	monasteryFeature.AddRectangle(rl.NewVector2(20, 20), rl.NewVector2(20, 20), rl.Black)
+	monasteryFeature := feature.New(rl.Black)
+	monasteryFeature.AddRectangle(rl.NewVector2(20, 20), rl.NewVector2(20, 20))
 	return monasteryFeature
 }
 
@@ -29,7 +27,7 @@ var (
 )
 
 func Road(s side.Side) feature.Feature {
-	roadFeature := feature.New()
+	roadFeature := feature.New(rl.DarkGray)
 
 	edgeCtr := 0
 
@@ -38,99 +36,98 @@ func Road(s side.Side) feature.Feature {
 			edgeCtr++
 			switch edge {
 			case side.Top:
-				roadFeature.AddRectangle(topRoadPosition, verticalHalfRoadSize, rl.DarkGray)
+				roadFeature.AddRectangle(topRoadPosition, verticalHalfRoadSize)
 			case side.Right:
-				roadFeature.AddRectangle(rightRoadPosition, horizontalHalfRoadSize, rl.DarkGray)
+				roadFeature.AddRectangle(rightRoadPosition, horizontalHalfRoadSize)
 			case side.Bottom:
-				roadFeature.AddRectangle(bottomRoadPosition, verticalHalfRoadSize, rl.DarkGray)
+				roadFeature.AddRectangle(bottomRoadPosition, verticalHalfRoadSize)
 			case side.Left:
-				roadFeature.AddRectangle(leftRoadPosition, horizontalHalfRoadSize, rl.DarkGray)
+				roadFeature.AddRectangle(leftRoadPosition, horizontalHalfRoadSize)
 			}
 		}
 	}
 	if edgeCtr > 1 {
-		roadFeature.AddRectangle(roadConnectorPosition, roadConnectorSize, rl.DarkGray)
+		roadFeature.AddRectangle(roadConnectorPosition, roadConnectorSize)
 	}
 
 	return roadFeature
 }
 
-func oneEdgeCity(s side.Side) feature.Feature {
+func oneEdgeCity(s side.Side, hasShield bool) feature.Feature {
 	if s&side.Top == side.Top {
-		return TopCity()
+		return TopCity(hasShield)
 	} else if s&side.Right == side.Right {
-		return RightCity()
+		return RightCity(hasShield)
 	} else if s&side.Bottom == side.Bottom {
-		return BottomCity()
+		return BottomCity(hasShield)
 	} else {
-		return LeftCity()
+		return LeftCity(hasShield)
 	}
 }
 
-func fourEdgeCity() feature.Feature {
-	cityFeature := feature.New()
-	cityFeature.AddRectangle(rl.NewVector2(0, 0), rl.NewVector2(60, 60), rl.DarkBrown)
+func fourEdgeCity(hasShield bool) feature.Feature {
+	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature.AddRectangle(rl.NewVector2(0, 0), rl.NewVector2(60, 60))
+	if hasShield {
+		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
+	}
 	return cityFeature
 }
 
 var ()
 
-func cornerCity(s side.Side) feature.Feature {
+func cornerCity(s side.Side, hasShield bool) feature.Feature {
 	if s&side.Top == side.Top {
 		if s&side.Right == side.Right {
-			fmt.Println("TopRight")
-			return TopRightCity()
+			return TopRightCity(hasShield)
 		} else {
-			fmt.Println("TopLeft")
-			return TopLeftCity()
+			return TopLeftCity(hasShield)
 		}
 	} else {
 		if s&side.Right == side.Right {
-			fmt.Println("BottomRight")
-			return BottomRightCity()
+			return BottomRightCity(hasShield)
 		} else {
-			fmt.Println("BottomLeft")
-			return BottomLeftCity()
+			return BottomLeftCity(hasShield)
 		}
 	}
 }
 
-func mirrorCity(s side.Side) feature.Feature {
+func mirrorCity(s side.Side, hasShield bool) feature.Feature {
 	if s&side.Top == side.Top {
-		return TopBottomCity()
+		return TopBottomCity(hasShield)
 	} else {
-		return LeftRightCity()
+		return LeftRightCity(hasShield)
 	}
 }
 
-func threeEdgeCity(s side.Side) feature.Feature {
+func threeEdgeCity(s side.Side, hasShield bool) feature.Feature {
 	if s&(side.Top|side.Left|side.Bottom) == (side.Top | side.Left | side.Bottom) {
-		return BottomLeftTopCity()
+		return BottomLeftTopCity(hasShield)
 	} else if s&(side.Right|side.Left|side.Bottom) == (side.Right | side.Left | side.Bottom) {
-		return RightBottomLeftCity()
+		return RightBottomLeftCity(hasShield)
 	} else if s&(side.Top|side.Left|side.Right) == (side.Top | side.Left | side.Right) {
-		return LeftTopRightCity()
+		return LeftTopRightCity(hasShield)
 	} else {
-		return TopRightBottomCity()
+		return TopRightBottomCity(hasShield)
 	}
 }
 
-func City(s side.Side) feature.Feature {
-	cityFeature := feature.New()
+func City(s side.Side, hasShield bool) feature.Feature {
+	cityFeature := feature.New(rl.DarkBrown)
 	edgesNumber := s.GetCardinalDirectionsLength()
 	switch edgesNumber {
 	case 1:
-		return oneEdgeCity(s)
+		return oneEdgeCity(s, hasShield)
 	case 2:
 		if s == s.Mirror() {
-			return mirrorCity(s)
+			return mirrorCity(s, hasShield)
 		} else {
-			return cornerCity(s)
+			return cornerCity(s, hasShield)
 		}
 	case 3:
-		return threeEdgeCity(s)
+		return threeEdgeCity(s, hasShield)
 	case 4:
-		return fourEdgeCity()
+		return fourEdgeCity(hasShield)
 	}
 	return cityFeature
 }
