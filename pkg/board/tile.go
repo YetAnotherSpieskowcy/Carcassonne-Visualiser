@@ -26,7 +26,7 @@ func (tile *Tile) AddFeature(newFeature feature.Feature) {
 
 func (tile Tile) calculateLocationOnBoard(offset rl.Vector2) rl.Vector2 {
 	location := rl.Vector2{}
-	location.X = float32((boardSize-tileSize)/2 + tile.Position.X()*tileSize - int16(offset.X)*tileSize)
+	location.X = float32((boardSize-tileSize)/2 + tile.Position.X()*tileSize + int16(offset.X)*tileSize)
 	location.Y = float32((boardSize-tileSize)/2 - tile.Position.Y()*tileSize - int16(offset.Y)*tileSize)
 	return location
 }

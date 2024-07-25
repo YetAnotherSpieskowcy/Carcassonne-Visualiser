@@ -25,13 +25,13 @@ func main() {
 		case rl.KeyA:
 			game.Update(false)
 		case rl.KeyLeft:
-			game.MoveBoard(rl.NewVector2(1, 0))
-		case rl.KeyRight:
 			game.MoveBoard(rl.NewVector2(-1, 0))
+		case rl.KeyRight:
+			game.MoveBoard(rl.NewVector2(1, 0))
 		case rl.KeyUp:
-			game.MoveBoard(rl.NewVector2(0, -1))
-		case rl.KeyDown:
 			game.MoveBoard(rl.NewVector2(0, 1))
+		case rl.KeyDown:
+			game.MoveBoard(rl.NewVector2(0, -1))
 		}
 		game.Draw()
 	}
