@@ -66,7 +66,7 @@ func oneEdgeCity(s side.Side, hasShield bool) feature.Feature {
 }
 
 func fourEdgeCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 	cityFeature.AddRectangle(rl.NewVector2(0, 0), rl.NewVector2(60, 60))
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))

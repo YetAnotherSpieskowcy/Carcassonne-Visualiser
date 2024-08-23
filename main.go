@@ -6,11 +6,13 @@ import (
 )
 
 const (
-	screenWidth  = 800
+	screenWidth  = 1200
 	screenHeight = 875
 )
 
 func main() {
+	//pkg.GenerateLogs()
+
 	game := pkg.Game{}
 	game.Init("test_file.jsonl")
 

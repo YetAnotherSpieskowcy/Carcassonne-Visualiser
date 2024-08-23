@@ -89,8 +89,8 @@ func (board Board) Draw() {
 	// Draw tiles
 	for _, tile := range board.tiles {
 		// Draw tile only if it is visible
-		if tile.Position.X() >= int16(board.minRange.X) && tile.Position.X() <= int16(board.maxRange.X) &&
-			tile.Position.Y() >= int16(board.minRange.Y) && tile.Position.Y() <= int16(board.maxRange.Y) {
+		if tile.position.X() >= int16(board.minRange.X) && tile.position.X() <= int16(board.maxRange.X) &&
+			tile.position.Y() >= int16(board.minRange.Y) && tile.position.Y() <= int16(board.maxRange.Y) {
 			tile.DrawTile(board.offset)
 		}
 	}

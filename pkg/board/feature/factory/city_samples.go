@@ -5,8 +5,10 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+var cityColor = rl.NewColor(124, 67, 39, 255)
+
 func TopCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(20, 15), rl.NewVector2(20, 0)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(40, 0), rl.NewVector2(40, 15)})
@@ -20,7 +22,7 @@ func TopCity(hasShield bool) feature.Feature {
 }
 
 func BottomCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(20, 60), rl.NewVector2(20, 45)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 60), rl.NewVector2(40, 45), rl.NewVector2(40, 60)})
@@ -34,7 +36,7 @@ func BottomCity(hasShield bool) feature.Feature {
 }
 
 func RightCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(45, 20), rl.NewVector2(60, 20)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 60), rl.NewVector2(60, 40), rl.NewVector2(45, 40)})
@@ -48,7 +50,7 @@ func RightCity(hasShield bool) feature.Feature {
 }
 
 func LeftCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 20), rl.NewVector2(15, 20)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(15, 40), rl.NewVector2(0, 40)})
@@ -62,7 +64,7 @@ func LeftCity(hasShield bool) feature.Feature {
 }
 
 func TopRightCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(20, 10), rl.NewVector2(60, 0)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(50, 40), rl.NewVector2(60, 60)})
@@ -76,7 +78,7 @@ func TopRightCity(hasShield bool) feature.Feature {
 }
 
 func TopLeftCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(40, 10), rl.NewVector2(60, 0)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(10, 40), rl.NewVector2(0, 0)})
@@ -90,7 +92,7 @@ func TopLeftCity(hasShield bool) feature.Feature {
 }
 
 func BottomRightCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(60, 60), rl.NewVector2(20, 50)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(50, 20), rl.NewVector2(60, 60)})
@@ -104,7 +106,7 @@ func BottomRightCity(hasShield bool) feature.Feature {
 }
 
 func BottomLeftCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 60), rl.NewVector2(10, 20)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(60, 60), rl.NewVector2(40, 50)})
@@ -118,7 +120,7 @@ func BottomLeftCity(hasShield bool) feature.Feature {
 }
 
 func TopBottomCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(15, 10), rl.NewVector2(15, 0)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(45, 0), rl.NewVector2(45, 10)})
@@ -134,7 +136,7 @@ func TopBottomCity(hasShield bool) feature.Feature {
 }
 
 func LeftRightCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 15), rl.NewVector2(10, 15)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 45), rl.NewVector2(0, 60), rl.NewVector2(10, 45)})
@@ -150,7 +152,7 @@ func LeftRightCity(hasShield bool) feature.Feature {
 }
 
 func LeftTopRightCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 45), rl.NewVector2(0, 60), rl.NewVector2(10, 45)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 45), rl.NewVector2(50, 45), rl.NewVector2(60, 60)})
@@ -164,7 +166,7 @@ func LeftTopRightCity(hasShield bool) feature.Feature {
 }
 
 func TopRightBottomCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(15, 10), rl.NewVector2(15, 0)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(15, 60), rl.NewVector2(15, 50)})
@@ -178,7 +180,7 @@ func TopRightBottomCity(hasShield bool) feature.Feature {
 }
 
 func RightBottomLeftCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 15), rl.NewVector2(10, 15)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(50, 15), rl.NewVector2(60, 15)})
@@ -192,7 +194,7 @@ func RightBottomLeftCity(hasShield bool) feature.Feature {
 }
 
 func BottomLeftTopCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(45, 0), rl.NewVector2(45, 10)})
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(45, 60), rl.NewVector2(60, 60), rl.NewVector2(45, 50)})
