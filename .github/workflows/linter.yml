@@ -8,7 +8,7 @@ on:
     branches: main
 permissions: read-all
 jobs:
-  build:
+  lint:
     name: Lint Code Base
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +18,12 @@ jobs:
           # Full git history is needed to get a proper
           # list of changed files within `super-linter`
           fetch-depth: 0
+      - name: Install dependencies
+        run: sudo apt-get install libsdl2-dev libxkbcommon-dev
+      - name: Get Raylib
+        run: go get -v -u github.com/gen2brain/raylib-go/raylib
+      - name: Get Carcassonne-Engine
+        run: go get -u github.com/YetAnotherSpieskowcy/Carcassonne-Engine@main
       - name: Lint Code Base
         uses: super-linter/super-linter@v6.3.1
         env:
