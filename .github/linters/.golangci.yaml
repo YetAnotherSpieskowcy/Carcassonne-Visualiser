@@ -1,0 +1,4 @@
+linters-settings:
+  run:
+    build-tags:
+      - sdl

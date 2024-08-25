@@ -19,7 +19,7 @@ jobs:
           # list of changed files within `super-linter`
           fetch-depth: 0
       - name: Install dependencies
-        run: sudo apt-get install libsdl2-dev libwayland-client0 libwayland-dev libxkbcommon-dev
+        run: sudo apt-get install libsdl2-dev libwayland-dev libxkbcommon-dev
       - name: Get Raylib
         run: go get -v -u github.com/gen2brain/raylib-go/raylib
       - name: Get Carcassonne-Engine
