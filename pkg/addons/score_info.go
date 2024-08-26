@@ -82,7 +82,19 @@ func (scoreInfo ScoreInfo) Show(move uint32) {
 	if ok && move > 0 {
 		rl.DrawText("Returned meeples:", int32(scoreInfo.position.X), position+80, 20, rl.Black)
 		position += 100
-		for id, returnedMeeples := range scoreReport.ReturnedMeeples {
+
+		// display returned meeples in ascending player ID order. Without this the order is random in every frame, and the text blinks a lot
+		maxPlayerID := elements.ID(0)
+		for id := range scoreReport.ReturnedMeeples {
+			if id > maxPlayerID {
+				maxPlayerID = id
+			}
+		}
+		for id := range maxPlayerID + 1 {
+			returnedMeeples, ok := scoreReport.ReturnedMeeples[id]
+			if !ok {
+				continue
+			}
 			text := "Player " + fmt.Sprint(id) + ":"
 			rl.DrawText(text, int32(scoreInfo.position.X), position, 20, rl.Black)
 			for idx, meeple := range returnedMeeples {
