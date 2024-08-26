@@ -11,8 +11,6 @@ const (
 )
 
 func main() {
-	//pkg.GenerateLogs()
-
 	game := pkg.Game{}
 	game.Init("test_file.jsonl")
 
