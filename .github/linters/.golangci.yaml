@@ -1,6 +1,0 @@
-run:
-  build-tags:
-    - sdl
-linters:
-  disable:
-    - typecheck
