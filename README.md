@@ -1,8 +1,10 @@
 # Carcassonne-Visualiser
 
-This application requires raylib-go, for installation follow instructions (https://github.com/gen2brain/raylib-go/tree/master). 
+This application requires: 
+- raylib-go (https://github.com/gen2brain/raylib-go/tree/master),
+- SDL2
 
 ## Run
 ```console
-go run .
+go run . -tags sdl
 ```
