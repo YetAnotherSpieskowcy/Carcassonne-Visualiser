@@ -7,10 +7,9 @@ import (
 
 type Modifier struct {
 	drawable drawable.Drawable
-	name     string
 }
 
-func New(color rl.Color, name string) Modifier {
+func New(color rl.Color) Modifier {
 	return Modifier{
 		drawable: drawable.New(color),
 	}

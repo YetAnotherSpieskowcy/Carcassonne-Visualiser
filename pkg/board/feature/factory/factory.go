@@ -74,8 +74,6 @@ func fourEdgeCity(hasShield bool) feature.Feature {
 	return cityFeature
 }
 
-var ()
-
 func cornerCity(s side.Side, hasShield bool) feature.Feature {
 	if s&side.Top == side.Top {
 		if s&side.Right == side.Right {

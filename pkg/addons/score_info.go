@@ -12,8 +12,6 @@ type ScoreInfo struct {
 	scoreReports     map[uint32]elements.ScoreReport
 	nextScoreReports map[uint32]elements.ScoreReport
 
-	//playerScores     map[uint32]map[elements.ID]uint32
-	//nextPlayerScores map[uint32]map[elements.ID]uint32
 	position rl.Vector2
 }
 

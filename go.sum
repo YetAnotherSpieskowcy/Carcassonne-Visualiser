@@ -4,6 +4,8 @@ github.com/YetAnotherSpieskowcy/Carcassonne-Engine v0.0.0-20240722181534-3594c40
 github.com/YetAnotherSpieskowcy/Carcassonne-Engine v0.0.0-20240722181534-3594c402464e/go.mod h1:wR1PIwvZk8XClmWtB3+L9+TE6fePnKXGvy7nIyLE0ik=
 github.com/YetAnotherSpieskowcy/Carcassonne-Engine v0.0.0-20240822225716-d73da311bfa0 h1:3+joJjN2VZ9YSAXtE5rLeJCa7gmT2n1hx/APIQpPFmE=
 github.com/YetAnotherSpieskowcy/Carcassonne-Engine v0.0.0-20240822225716-d73da311bfa0/go.mod h1:wR1PIwvZk8XClmWtB3+L9+TE6fePnKXGvy7nIyLE0ik=
+github.com/YetAnotherSpieskowcy/Carcassonne-Engine v0.0.0-20240825150632-b53bbbaed8f8 h1:cyx9X5dXJU8OKlrVvqaJCy0N2VGW2LVCiopouRg2af4=
+github.com/YetAnotherSpieskowcy/Carcassonne-Engine v0.0.0-20240825150632-b53bbbaed8f8/go.mod h1:wR1PIwvZk8XClmWtB3+L9+TE6fePnKXGvy7nIyLE0ik=
 github.com/ebitengine/purego v0.7.1 h1:6/55d26lG3o9VCZX8lping+bZcmShseiqlh2bnUDiPA=
 github.com/ebitengine/purego v0.7.1/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20240807111636-8861ee437da9 h1:voUyZVwDxeiKv31gHmzHY95Oq/+0+ozj8zmKDiaag/o=
