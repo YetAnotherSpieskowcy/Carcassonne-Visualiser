@@ -6,12 +6,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func Monastery() feature.Feature {
-	monasteryFeature := feature.New(rl.Black)
-	monasteryFeature.AddRectangle(rl.NewVector2(20, 20), rl.NewVector2(20, 20))
-	return monasteryFeature
-}
-
 var (
 	topRoadPosition    = rl.NewVector2(25, 0)
 	rightRoadPosition  = rl.NewVector2(35, 25)
@@ -24,7 +18,20 @@ var (
 
 	verticalHalfRoadSize   = rl.NewVector2(10, 25)
 	horizontalHalfRoadSize = rl.NewVector2(25, 10)
+
+	topRightFieldPosition    = rl.NewVector2(30, 0)
+	bottomRightFieldPosition = rl.NewVector2(30, 30)
+	bottomLeftFieldPosition  = rl.NewVector2(0, 30)
+	topLeftFieldPosition     = rl.NewVector2(0, 0)
+
+	fieldSize = rl.NewVector2(30, 30)
 )
+
+func Monastery() feature.Feature {
+	monasteryFeature := feature.New(rl.Black)
+	monasteryFeature.AddRectangle(rl.NewVector2(20, 20), rl.NewVector2(20, 20))
+	return monasteryFeature
+}
 
 func Road(s side.Side) feature.Feature {
 	roadFeature := feature.New(rl.DarkGray)
@@ -128,4 +135,21 @@ func City(s side.Side, hasShield bool) feature.Feature {
 		return fourEdgeCity(hasShield)
 	}
 	return cityFeature
+}
+
+func Field(s side.Side) feature.Feature {
+	fieldFeature := feature.New(rl.DarkGreen)
+	if s.OverlapsSide(side.TopRightEdge | side.RightTopEdge) {
+		fieldFeature.AddRectangle(topRightFieldPosition, fieldSize)
+	}
+	if s.OverlapsSide(side.RightBottomEdge | side.BottomRightEdge) {
+		fieldFeature.AddRectangle(bottomRightFieldPosition, fieldSize)
+	}
+	if s.OverlapsSide(side.BottomLeftEdge | side.LeftBottomEdge) {
+		fieldFeature.AddRectangle(bottomLeftFieldPosition, fieldSize)
+	}
+	if s.OverlapsSide(side.LeftTopEdge | side.TopLeftEdge) {
+		fieldFeature.AddRectangle(topLeftFieldPosition, fieldSize)
+	}
+	return fieldFeature
 }

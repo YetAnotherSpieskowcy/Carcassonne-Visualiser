@@ -13,13 +13,30 @@ import (
 )
 
 func parseFeatures(f elements.PlacedFeature) feature.Feature {
+	var newFeature feature.Feature
+
 	if f.FeatureType == engineFeature.Monastery {
-		return factory.Monastery()
+		newFeature = factory.Monastery()
 	} else if f.FeatureType == engineFeature.Road {
-		return factory.Road(f.Sides)
+		newFeature = factory.Road(f.Sides)
+	} else if f.FeatureType == engineFeature.Field {
+		newFeature = factory.Field(f.Sides)
+	} else if f.FeatureType == engineFeature.City {
+		newFeature = factory.City(f.Sides, f.ModifierType == engineModifier.Shield)
 	} else {
-		return factory.City(f.Sides, f.ModifierType == engineModifier.Shield)
+		panic("unrecognised feature type")
 	}
+
+	if f.Meeple.Type != elements.NoneMeeple {
+		meepleColors := []rl.Color{
+			rl.White, // playerID = 0, should never appear
+			rl.Blue,
+			rl.Red,
+		}
+		newFeature.SetColor(meepleColors[f.Meeple.PlayerID])
+	}
+
+	return newFeature
 }
 
 func ParseStartEntry(entry logger.Entry) (board.Tile, int) {
@@ -32,6 +49,8 @@ func ParseStartEntry(entry logger.Entry) (board.Tile, int) {
 	for _, f := range placedStartTile.Features {
 		if f.FeatureType != engineFeature.Field {
 			tile.AddFeature(parseFeatures(f))
+		} else {
+			tile.AddFeatureBelowOthers(parseFeatures(f))
 		}
 	}
 
@@ -46,6 +65,8 @@ func ParsePlaceTileEntry(entry logger.Entry) board.Tile {
 	for _, f := range placedTileContent.Move.Features {
 		if f.FeatureType != engineFeature.Field {
 			tile.AddFeature(parseFeatures(f))
+		} else {
+			tile.AddFeatureBelowOthers(parseFeatures(f))
 		}
 	}
 

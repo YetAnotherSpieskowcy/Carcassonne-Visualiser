@@ -19,6 +19,10 @@ func New(color rl.Color) Drawable {
 	}
 }
 
+func (drawable *Drawable) SetColor(color rl.Color) {
+	drawable.color = color
+}
+
 func (drawable *Drawable) AddRectangle(offsetOnTile rl.Vector2, size rl.Vector2) {
 	drawable.rectangles = append(drawable.rectangles, components.NewRectangle(offsetOnTile, size))
 }
