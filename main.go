@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -11,8 +13,10 @@ const (
 )
 
 func main() {
+	log_filename := os.Args[1]
+
 	game := pkg.Game{}
-	game.Init("test_file.jsonl")
+	game.Init(log_filename)
 
 	rl.InitWindow(screenWidth, screenHeight, "Carcassonne-Visualiser")
 	rl.SetTargetFPS(60)
