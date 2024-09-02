@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 run () {
     echo "Running application..."
@@ -12,13 +12,13 @@ update () {
 	go get -v -u github.com/gen2brain/raylib-go/raylib
 }
 
-if [$1 -eq "run"]; then
-    if [$# -eq 2]; then
+if [ $1 == "run" ]; then
+    if [ $# -eq 2 ]; then
         run
     else
         echo "Missing log file name"
     fi
-elif [$1 -eq "update"]; then
+elif [ $1 == "update" ]; then
     update
 else
     echo "Unknown command "
