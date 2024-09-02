@@ -16,6 +16,8 @@ type Game struct {
 	nextTile       board.Tile
 	nextTilePlaced bool
 	moveCtr        uint32
+
+	skipMoves map[uint32]struct{}
 }
 
 func (game *Game) Init(filename string) {
@@ -36,40 +38,68 @@ func (game *Game) Init(filename string) {
 		rl.NewVector2(10, 815),
 	)
 
+	game.skipMoves = map[uint32]struct{}{}
 }
 
 func (game *Game) Update(nextMove bool) {
 	if nextMove {
-		game.moveCtr++
-		readNewEntry := game.board.NextMove(game.nextTile, game.nextTilePlaced)
-		if readNewEntry {
-			game.nextTilePlaced = true
-			for game.nextTilePlaced {
-				entry, ok := <-game.logs
-				if ok {
-					if entry.Event == logger.PlaceTileEvent {
-						game.nextTile = ParsePlaceTileEntry(entry)
-						game.nextTilePlaced = false
-					} else if entry.Event == logger.ScoreEvent {
-						scoreReport := ParseScoreEntry(entry)
-						game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
+		game.nextMove()
+	} else {
+		game.previousMove()
+	}
+}
 
-						for _, meeples := range scoreReport.ReturnedMeeples {
-							for _, meeple := range meeples {
-								game.board.ResetTile(meeple.Position)
-								game.moveCtr++
-							}
+func (game *Game) nextMove() {
+	game.incrementMoveCtr()
+	readNewEntry := game.board.NextMove(game.nextTile, game.nextTilePlaced)
+	if readNewEntry {
+		game.nextTilePlaced = true
+		for game.nextTilePlaced {
+			entry, ok := <-game.logs
+			if ok {
+				if entry.Event == logger.PlaceTileEvent {
+					game.nextTile = ParsePlaceTileEntry(entry)
+					game.nextTilePlaced = false
+				} else if entry.Event == logger.ScoreEvent {
+					scoreReport := ParseScoreEntry(entry)
+
+					for _, meeples := range scoreReport.ReturnedMeeples {
+						for _, meeple := range meeples {
+							game.board.ResetTile(meeple.Position)
+							game.skipMoves[game.moveCtr] = struct{}{}
+							game.incrementMoveCtr()
 						}
 					}
+					game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
 				}
 			}
-		} else {
-			game.scoreInfo.NextScores(game.moveCtr)
 		}
-	} else if game.moveCtr > 0 {
+	} else {
+		game.scoreInfo.NextScores(game.moveCtr)
+	}
+}
+
+func (game *Game) previousMove() {
+	if game.moveCtr > 0 {
 		game.board.PreviousMove()
 		game.scoreInfo.PreviousScores(game.moveCtr)
-		game.moveCtr--
+		game.decrementMoveCtr()
+	}
+}
+
+func (game *Game) incrementMoveCtr() {
+	game.moveCtr++
+	_, skipMove := game.skipMoves[game.moveCtr]
+	if skipMove {
+		game.nextMove()
+	}
+}
+
+func (game *Game) decrementMoveCtr() {
+	game.moveCtr--
+	_, skipMove := game.skipMoves[game.moveCtr]
+	if skipMove {
+		game.previousMove()
 	}
 }
 
