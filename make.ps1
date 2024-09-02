@@ -13,8 +13,6 @@ Command to execute. See Cmdlet's description for more information.
 
 #>
 
-# I'm too dumb for PowerShell, so $script:availableCommands needs to be defined in 2 places // Jack
-
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
     "PSReviewUnusedParameter",
     "",
