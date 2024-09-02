@@ -28,12 +28,7 @@ func parseFeatures(f elements.PlacedFeature) feature.Feature {
 	}
 
 	if f.Meeple.Type != elements.NoneMeeple {
-		meepleColors := []rl.Color{
-			rl.White, // playerID = 0, should never appear
-			rl.Blue,
-			rl.Red,
-		}
-		newFeature.SetColor(meepleColors[f.Meeple.PlayerID])
+		newFeature.SetCustomColor(factory.MeepleColors[f.Meeple.PlayerID])
 	}
 
 	return newFeature
@@ -44,7 +39,7 @@ func ParseStartEntry(entry logger.Entry) (board.Tile, int) {
 
 	placedStartTile := elements.ToPlacedTile(startContent.StartingTile)
 
-	tile := board.NewTile(position.New(0, 0), rl.DarkGreen, rl.Red)
+	tile := board.NewTile(position.New(0, 0), factory.FieldColor, rl.Red)
 
 	for _, f := range placedStartTile.Features {
 		if f.FeatureType != engineFeature.Field {
@@ -60,7 +55,7 @@ func ParseStartEntry(entry logger.Entry) (board.Tile, int) {
 func ParsePlaceTileEntry(entry logger.Entry) board.Tile {
 	placedTileContent := logger.ParsePlaceTileEntryContent(entry.Content)
 
-	tile := board.NewTile(placedTileContent.Move.Position, rl.DarkGreen, rl.LightGray)
+	tile := board.NewTile(placedTileContent.Move.Position, factory.FieldColor, rl.LightGray)
 
 	for _, f := range placedTileContent.Move.Features {
 		if f.FeatureType != engineFeature.Field {

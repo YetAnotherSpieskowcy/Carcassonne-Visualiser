@@ -53,6 +53,13 @@ func (game *Game) Update(nextMove bool) {
 					} else if entry.Event == logger.ScoreEvent {
 						scoreReport := ParseScoreEntry(entry)
 						game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
+
+						for _, meeples := range scoreReport.ReturnedMeeples {
+							for _, meeple := range meeples {
+								game.board.ResetTile(meeple.Position)
+								game.moveCtr++
+							}
+						}
 					}
 				}
 			}

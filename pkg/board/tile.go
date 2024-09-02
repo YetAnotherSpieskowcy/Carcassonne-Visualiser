@@ -37,6 +37,12 @@ func (tile Tile) calculateLocationOnBoard(offset rl.Vector2) rl.Vector2 {
 	return location
 }
 
+func (tile *Tile) ClearCustomColors() {
+	for i := range tile.features {
+		tile.features[i].ClearCustomColor()
+	}
+}
+
 func (tile Tile) DrawTile(offset rl.Vector2) {
 	pos := tile.calculateLocationOnBoard(offset)
 	rl.DrawRectangleV(pos, rl.NewVector2(tileSize, tileSize), tile.color)

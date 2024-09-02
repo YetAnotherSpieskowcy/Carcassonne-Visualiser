@@ -1,7 +1,9 @@
 package board
 
 import (
+	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/position"
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/huandu/go-clone"
 )
 
 const (
@@ -63,6 +65,17 @@ func (board *Board) PreviousMove() {
 		board.nextMoves = append(board.nextMoves, board.tiles[tileIndex])
 		board.tiles = board.tiles[:tileIndex]
 	}
+}
+
+func (board *Board) ResetTile(position position.Position) {
+	var clearedTile Tile
+	for _, tile := range board.tiles {
+		if tile.position == position {
+			clearedTile = clone.Clone(tile).(Tile)
+			clearedTile.ClearCustomColors()
+		}
+	}
+	board.tiles = append(board.tiles, clearedTile)
 }
 
 func (board Board) Draw() {

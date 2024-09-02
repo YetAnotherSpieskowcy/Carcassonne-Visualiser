@@ -28,13 +28,13 @@ var (
 )
 
 func Monastery() feature.Feature {
-	monasteryFeature := feature.New(rl.Black)
+	monasteryFeature := feature.New(MonasteryColor)
 	monasteryFeature.AddRectangle(rl.NewVector2(20, 20), rl.NewVector2(20, 20))
 	return monasteryFeature
 }
 
 func Road(s side.Side) feature.Feature {
-	roadFeature := feature.New(rl.DarkGray)
+	roadFeature := feature.New(RoadColor)
 
 	edgeCtr := 0
 
@@ -73,7 +73,7 @@ func oneEdgeCity(s side.Side, hasShield bool) feature.Feature {
 }
 
 func fourEdgeCity(hasShield bool) feature.Feature {
-	cityFeature := feature.New(cityColor)
+	cityFeature := feature.New(CityColor)
 	cityFeature.AddRectangle(rl.NewVector2(0, 0), rl.NewVector2(60, 60))
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
@@ -118,7 +118,7 @@ func threeEdgeCity(s side.Side, hasShield bool) feature.Feature {
 }
 
 func City(s side.Side, hasShield bool) feature.Feature {
-	cityFeature := feature.New(rl.DarkBrown)
+	cityFeature := feature.New(CityColor)
 	edgesNumber := s.GetCardinalDirectionsLength()
 	switch edgesNumber {
 	case 1:
@@ -138,7 +138,7 @@ func City(s side.Side, hasShield bool) feature.Feature {
 }
 
 func Field(s side.Side) feature.Feature {
-	fieldFeature := feature.New(rl.DarkGreen)
+	fieldFeature := feature.New(FieldColor)
 	if s.OverlapsSide(side.TopRightEdge | side.RightTopEdge) {
 		fieldFeature.AddRectangle(topRightFieldPosition, fieldSize)
 	}
