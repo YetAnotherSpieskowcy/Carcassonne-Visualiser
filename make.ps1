@@ -20,21 +20,11 @@ Command to execute. See Cmdlet's description for more information.
 )]
 [CmdletBinding()]
 param (
-    [parameter(
-       ParameterSetName="run", 
-       Mandatory = $True, 
-       Position = 0)]
-    [parameter(
-       ParameterSetName="update", 
-       Mandatory = $True, 
-       Position = 0)]
+    [parameter(Mandatory = $true)]
     [ValidateSet("run", "update")]
     [String]
     $command,
-    [parameter(
-       ParameterSetName="run", 
-       Mandatory = $True, 
-       Position = 1)]
+    [parameter(Mandatory = $false)]
     [String]
     $filename,
     [switch]
@@ -48,9 +38,13 @@ function Exit-On-Fail([int]$exitCode) {
 }
 
 function run() {
-    Write-Output "Running application..."
-    & go run . $filename -tags sdl 
-    Exit-ON-Fail $LASTEXITCODE
+    if (-not ([string]::IsNullOrEmpty($filename))) {
+        Write-Output "Running application..."
+        & go run . $filename -tags sdl 
+        Exit-ON-Fail $LASTEXITCODE
+    } else {
+        Write-Output "Log file name not specified"
+    }
 }
 
 function update() {
