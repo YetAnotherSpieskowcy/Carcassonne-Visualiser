@@ -40,7 +40,7 @@ function Exit-On-Fail([int]$exitCode) {
 function run() {
     if (-not ([string]::IsNullOrEmpty($filename))) {
         Write-Output "Running application..."
-        & go run . $filename -tags sdl 
+        & go run -tags sdl . $filename
         Exit-ON-Fail $LASTEXITCODE
     } else {
         Write-Output "Log file name not specified"

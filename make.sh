@@ -2,7 +2,7 @@
 
 run () {
     echo "Running application..."
-    go run . $2 -tags sdl
+    go run -tags sdl . $1
 }
 
 update () {
@@ -14,7 +14,7 @@ update () {
 
 if [ $1 == "run" ]; then
     if [ $# -eq 2 ]; then
-        run
+        run $2
     else
         echo "Missing log file name"
     fi
