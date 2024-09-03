@@ -7,9 +7,9 @@ run () {
 
 update () {
     echo "Updating Carcassonne-Engine..."
-	go get -u github.com/YetAnotherSpieskowcy/Carcassonne-Engine@main
-	echo "Updating raylib-go..."
-	go get -v -u github.com/gen2brain/raylib-go/raylib
+    go get -u github.com/YetAnotherSpieskowcy/Carcassonne-Engine@main
+    echo "Updating raylib-go..."
+    go get -v -u github.com/gen2brain/raylib-go/raylib
 }
 
 if [ $1 == "run" ]; then
