@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"os"
 
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg"
@@ -14,6 +16,12 @@ const (
 
 func main() {
 	log_filename := os.Args[1]
+
+	if _, err := os.Stat(log_filename); errors.Is(err, os.ErrNotExist) {
+		message := "File " + log_filename + " does not exist."
+		fmt.Println(message)
+		return
+	}
 
 	game := pkg.Game{}
 	game.Init(log_filename)
