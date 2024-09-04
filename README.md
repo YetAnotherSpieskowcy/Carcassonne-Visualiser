@@ -28,7 +28,7 @@ help follow [instructions](https://wiki.libsdl.org/SDL2/Installation#linuxunix).
    1. Download [SDL2 for MinGW](https://github.com/libsdl-org/SDL/releases) and extract zip content.
    2. Copy *x86_64-w64-mingw32* merging it with its respective directory (same directory name) in MinGW directory.
    3. From *x86_64-w64-mingw32* copy *bin*, *lib* and *share* directories merging them with their respective directories in MinGW directory.
-   4. From *x86_64-w64-mingw32/include/SDL2* copy all its content to include direcotry in MinGW directory.
+   4. From *x86_64-w64-mingw32/include/SDL2* copy all its content to include directory in MinGW directory.
 
 > [!NOTE]
 > It is important to copy only *x86_64-w64-mingw32/include/SDL2* content and not the whole directory as otherwise it may result in import problems.
