@@ -19,8 +19,19 @@ help follow [instructions](https://wiki.libsdl.org/SDL2/Installation#linuxunix).
 ### Windows
 
 1. Install [Go for Windows x86-64](https://go.dev/dl/).
-2. Download [SDL2 binary](https://github.com/libsdl-org/SDL/releases) and put the dll file in the system directory.
-3. Install raylib-go requirements following [intructions](https://github.com/gen2brain/raylib-go?tab=readme-ov-file#windows).
+2. Install [MinGW-w64](https://winlibs.com/) and add bin directory to PATH. It is required both by SDL2 and raylib-go.
+3. Install SDL2
+
+> [!NOTE]
+> Below installation instruction of SDL2 is dedicated for 64 bit system version.
+
+   1. Download [SDL2 for MinGW](https://github.com/libsdl-org/SDL/releases) and extract zip content.
+   2. Copy *x86_64-w64-mingw32* merging it with its respective directory (same directory name) in MinGW directory.
+   3. From *x86_64-w64-mingw32* copy *bin*, *lib* and *share* directories merging them with their respective directories in MinGW directory.
+   4. From *x86_64-w64-mingw32/include/SDL2* copy all its content to include direcotry in MinGW directory.
+
+> [!NOTE]
+> It is important to copy only *x86_64-w64-mingw32/include/SDL2* content and not the whole directory as otherwise it may result in import problems.
 
 ## Run application
 
@@ -35,6 +46,7 @@ Use this command to run applications. Requires log file name passed as parameter
 ### Windows
 
 ```console
+Set-ExecutionPolicy Bypass -Scope Process -Force
 ./make.ps1 run _log-filename_
 ```
 
@@ -51,5 +63,6 @@ Use this command to get latest versions of Carcassonne-Engine and raylib-go.
 ### Windows
 
 ```console
+Set-ExecutionPolicy Bypass -Scope Process -Force
 ./make.ps1 update
 ```
