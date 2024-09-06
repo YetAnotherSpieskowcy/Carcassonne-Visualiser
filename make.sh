@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/sh -e
 
 run () {
     echo "Running application..."
-    go run -tags sdl . $1
+    go run -tags sdl . "$1"
 }
 
 update () {
@@ -12,13 +12,13 @@ update () {
     go get -v -u github.com/gen2brain/raylib-go/raylib
 }
 
-if [ $1 == "run" ]; then
+if [ $1 = "run" ]; then
     if [ $# -eq 2 ]; then
-        run $2
+        run "$2"
     else
         echo "Missing log file name"
     fi
-elif [ $1 == "update" ]; then
+elif [ $1 = "update" ]; then
     update
 else
     echo "Unknown command "

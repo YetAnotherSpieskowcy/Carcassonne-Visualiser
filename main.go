@@ -20,7 +20,7 @@ func main() {
 	if _, err := os.Stat(log_filename); errors.Is(err, os.ErrNotExist) {
 		message := "File " + log_filename + " does not exist."
 		fmt.Println(message)
-		return
+		os.Exit(2)
 	}
 
 	game := pkg.Game{}

@@ -41,7 +41,7 @@ function run() {
     if (-not ([string]::IsNullOrEmpty($filename))) {
         Write-Output "Running application..."
         & go run -tags sdl . $filename
-        Exit-ON-Fail $LASTEXITCODE
+        Exit-On-Fail $LASTEXITCODE
     } else {
         Write-Output "Log file name not specified"
     }
@@ -52,7 +52,7 @@ function update() {
     & go get -u "github.com/YetAnotherSpieskowcy/Carcassonne-Engine@main"
     Write-Output "Updating raylib-go"
     & go get -v -u "github.com/gen2brain/raylib-go/raylib"
-    Exit-ON-Fail $LASTEXITCODE
+    Exit-On-Fail $LASTEXITCODE
 }
 
 $script:availableCommands = @(
