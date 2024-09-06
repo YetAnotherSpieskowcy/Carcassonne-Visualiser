@@ -50,6 +50,7 @@ function run() {
 function update() {
     Write-Output "Updating Carcassonne-Engine..."
     & go get -u "github.com/YetAnotherSpieskowcy/Carcassonne-Engine@main"
+    Exit-On-Fail $LASTEXITCODE
     Write-Output "Updating raylib-go"
     & go get -v -u "github.com/gen2brain/raylib-go/raylib"
     Exit-On-Fail $LASTEXITCODE
