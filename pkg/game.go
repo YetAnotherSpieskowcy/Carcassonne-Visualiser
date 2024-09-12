@@ -16,6 +16,7 @@ type Game struct {
 	nextTile       board.Tile
 	nextTilePlaced bool
 	moveCtr        uint32
+	moveCtrMax     uint32
 
 	skipMoves map[uint32]struct{}
 }
@@ -32,6 +33,7 @@ func (game *Game) Init(filename string) {
 	game.nextTile = ParsePlaceTileEntry(<-game.logs)
 	game.nextTilePlaced = false
 	game.moveCtr = 0
+	game.moveCtrMax = ^uint32(0) // max value of uint32
 
 	game.controlsInfo = addons.NewInfo(
 		"A - Previous move, D - Next move\nArrows - Move board",
@@ -50,6 +52,10 @@ func (game *Game) Update(nextMove bool) {
 }
 
 func (game *Game) nextMove() {
+	if game.moveCtr == game.moveCtrMax {
+		return
+	}
+
 	game.incrementMoveCtr()
 	readNewEntry := game.board.NextMove(game.nextTile, game.nextTilePlaced)
 	if readNewEntry {
@@ -72,6 +78,9 @@ func (game *Game) nextMove() {
 					}
 					game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
 				}
+			} else {
+				game.nextTilePlaced = false
+				game.moveCtrMax = game.moveCtr
 			}
 		}
 	} else {
@@ -80,11 +89,13 @@ func (game *Game) nextMove() {
 }
 
 func (game *Game) previousMove() {
-	if game.moveCtr > 0 {
-		game.board.PreviousMove()
-		game.scoreInfo.PreviousScores(game.moveCtr)
-		game.decrementMoveCtr()
+	if game.moveCtr == 0 {
+		return
 	}
+
+	game.board.PreviousMove()
+	game.scoreInfo.PreviousScores(game.moveCtr)
+	game.decrementMoveCtr()
 }
 
 func (game *Game) incrementMoveCtr() {
