@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"math"
+
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/logger"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/addons"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board"
@@ -33,7 +35,7 @@ func (game *Game) Init(filename string) {
 	game.nextTile = ParsePlaceTileEntry(<-game.logs)
 	game.nextTilePlaced = false
 	game.moveCtr = 0
-	game.moveCtrMax = ^uint32(0) // max value of uint32
+	game.moveCtrMax = math.MaxUint32
 
 	game.controlsInfo = addons.NewInfo(
 		"A - Previous move, D - Next move\nArrows - Move board",
