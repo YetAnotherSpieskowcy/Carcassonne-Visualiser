@@ -1,8 +1,6 @@
 package pkg
 
 import (
-	"math"
-
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/logger"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/addons"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board"
@@ -14,35 +12,35 @@ type Game struct {
 	controlsInfo addons.Info
 	scoreInfo    addons.ScoreInfo
 
-	logs           <-chan logger.Entry
-	nextTile       board.Tile
-	nextTilePlaced bool
-	moveCtr        uint32
-	moveCtrMax     uint32
-
-	skipMoves map[uint32]struct{}
+	logs            LogReader
+	nextEntry       logger.Entry
+	nextEntryExists bool
+	moveCtr         uint32
+	moveCtrMax      uint32
 }
 
 func (game *Game) Init(filename string) {
-	fileLogger, _ := logger.NewFromFile(filename)
+	logger, err := logger.NewLogReader(filename)
+	if err != nil {
+		panic(err)
+	}
+	game.logs = logger
 
-	game.logs = fileLogger.ReadLogs()
-
-	startTile, numOfPlayer := ParseStartEntry(<-game.logs)
+	startEntry, _ := game.logs.ReadEntry()
+	startTile, numOfPlayer := ParseStartEntry(startEntry)
 
 	game.scoreInfo = addons.NewScoreInfo(numOfPlayer, rl.NewVector2(810, 10))
 	game.board = board.NewBoard(startTile)
-	game.nextTile = ParsePlaceTileEntry(<-game.logs)
-	game.nextTilePlaced = false
+
+	game.nextEntry, game.nextEntryExists = game.logs.ReadEntry()
+
 	game.moveCtr = 0
-	game.moveCtrMax = math.MaxUint32
+	game.moveCtrMax = 0
 
 	game.controlsInfo = addons.NewInfo(
 		"A - Previous move, D - Next move\nArrows - Move board",
 		rl.NewVector2(10, 815),
 	)
-
-	game.skipMoves = map[uint32]struct{}{}
 }
 
 func (game *Game) Update(nextMove bool) {
@@ -54,39 +52,55 @@ func (game *Game) Update(nextMove bool) {
 }
 
 func (game *Game) nextMove() {
-	if game.moveCtr == game.moveCtrMax {
-		return
-	}
+	moveWasMade := false
 
-	game.incrementMoveCtr()
-	readNewEntry := game.board.NextMove(game.nextTile, game.nextTilePlaced)
-	if readNewEntry {
-		game.nextTilePlaced = true
-		for game.nextTilePlaced {
-			entry, ok := <-game.logs
-			if ok {
-				if entry.Event == logger.PlaceTileEvent {
-					game.nextTile = ParsePlaceTileEntry(entry)
-					game.nextTilePlaced = false
-				} else if entry.Event == logger.ScoreEvent {
-					scoreReport := ParseScoreEntry(entry)
+	if game.moveCtr < game.moveCtrMax {
+		// replay a move from previous moves history (already loaded from logs)
+		game.board.NextMove()
+		moveWasMade = true
 
-					for _, meeples := range scoreReport.ReturnedMeeples {
-						for _, meeple := range meeples {
-							game.board.ResetTile(meeple.Position)
-							game.skipMoves[game.moveCtr] = struct{}{}
-							game.incrementMoveCtr()
-						}
-					}
-					game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
-				}
-			} else {
-				game.nextTilePlaced = false
-				game.moveCtrMax = game.moveCtr
+	} else {
+		// play a new move
+		if !game.nextEntryExists {
+			game.nextEntry, game.nextEntryExists = game.logs.ReadEntry()
+		}
+
+		shouldProcessNextEntry := true
+		for shouldProcessNextEntry && game.nextEntryExists {
+			if game.nextEntry.Event == logger.PlaceTileEvent {
+				moveWasMade = true
+			}
+			game.processEntry(game.nextEntry)
+			game.nextEntry, game.nextEntryExists = game.logs.ReadEntry()
+
+			// we want to process all score events immediately after a tile was placed, but we don't want to place two tiles in a row
+			if game.nextEntry.Event == logger.PlaceTileEvent {
+				shouldProcessNextEntry = false
 			}
 		}
+	}
+
+	if moveWasMade {
+		game.incrementMoveCtr()
+	}
+	game.scoreInfo.NextScores(game.moveCtr)
+}
+
+func (game *Game) processEntry(entry logger.Entry) {
+	if entry.Event == logger.PlaceTileEvent {
+		tile := ParsePlaceTileEntry(entry)
+		game.board.NextNewMove(tile)
+
+	} else if entry.Event == logger.ScoreEvent {
+		scoreReport := ParseScoreEntry(entry)
+		for _, meeples := range scoreReport.ReturnedMeeples {
+			for _, meeple := range meeples {
+				game.board.ResetTile(meeple.Position)
+			}
+		}
+		game.scoreInfo.UpdateScores(scoreReport, game.moveCtr+1)
 	} else {
-		game.scoreInfo.NextScores(game.moveCtr)
+		panic("only PlaceTileEvent and ScoreEvent entries are currently supported")
 	}
 }
 
@@ -102,18 +116,13 @@ func (game *Game) previousMove() {
 
 func (game *Game) incrementMoveCtr() {
 	game.moveCtr++
-	_, skipMove := game.skipMoves[game.moveCtr]
-	if skipMove {
-		game.nextMove()
+	if game.moveCtr > game.moveCtrMax {
+		game.moveCtrMax = game.moveCtr
 	}
 }
 
 func (game *Game) decrementMoveCtr() {
 	game.moveCtr--
-	_, skipMove := game.skipMoves[game.moveCtr]
-	if skipMove {
-		game.previousMove()
-	}
 }
 
 func (game *Game) MoveBoard(direction rl.Vector2) {
