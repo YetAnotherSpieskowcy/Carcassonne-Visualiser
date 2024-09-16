@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"fmt"
+
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/logger"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/addons"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board"
@@ -12,7 +14,7 @@ type Game struct {
 	controlsInfo addons.Info
 	scoreInfo    addons.ScoreInfo
 
-	logs            LogReader
+	logs            logger.LogReader
 	nextEntry       logger.Entry
 	nextEntryExists bool
 	moveCtr         uint32
@@ -26,13 +28,16 @@ func (game *Game) Init(filename string) {
 	}
 	game.logs = logger
 
-	startEntry, _ := game.logs.ReadEntry()
+	startEntry, _, _ := game.logs.ReadEntry()
 	startTile, numOfPlayer := ParseStartEntry(startEntry)
 
 	game.scoreInfo = addons.NewScoreInfo(numOfPlayer, rl.NewVector2(810, 10))
 	game.board = board.NewBoard(startTile)
 
-	game.nextEntry, game.nextEntryExists = game.logs.ReadEntry()
+	game.nextEntry, game.nextEntryExists, err = game.logs.ReadEntry()
+	if err != nil {
+		fmt.Printf("Error reading log entry: %#v\n", err)
+	}
 
 	game.moveCtr = 0
 	game.moveCtrMax = 0
@@ -62,7 +67,11 @@ func (game *Game) nextMove() {
 	} else {
 		// play a new move
 		if !game.nextEntryExists {
-			game.nextEntry, game.nextEntryExists = game.logs.ReadEntry()
+			var err error
+			game.nextEntry, game.nextEntryExists, err = game.logs.ReadEntry()
+			if err != nil {
+				fmt.Printf("Error reading log entry: %#v\n", err)
+			}
 		}
 
 		shouldProcessNextEntry := true
@@ -71,7 +80,12 @@ func (game *Game) nextMove() {
 				moveWasMade = true
 			}
 			game.processEntry(game.nextEntry)
-			game.nextEntry, game.nextEntryExists = game.logs.ReadEntry()
+
+			var err error
+			game.nextEntry, game.nextEntryExists, err = game.logs.ReadEntry()
+			if err != nil {
+				fmt.Printf("Error reading log entry: %#v\n", err)
+			}
 
 			// we want to process all score events immediately after a tile was placed, but we don't want to place two tiles in a row
 			if game.nextEntry.Event == logger.PlaceTileEvent {
