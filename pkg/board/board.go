@@ -1,9 +1,7 @@
 package board
 
 import (
-	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/position"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/huandu/go-clone"
 )
 
 const (
@@ -11,15 +9,6 @@ const (
 	boardSize   = 800
 	boardOffset = boardSize % tileSize
 )
-
-type boardTile struct {
-	Tile
-	skipMove bool // set to true in resetting tiles that should immediately be followed by another tile
-}
-
-func newBoardTile(tile Tile) boardTile {
-	return boardTile{tile, false}
-}
 
 type Board struct {
 	screenWidth  int32
@@ -33,15 +22,15 @@ type Board struct {
 	maxTileY int16
 	minTileY int16
 
-	nextMoves []boardTile
-	tiles     []boardTile
+	nextMoves []Tile
+	tiles     []Tile
 }
 
 func NewBoard(startTile Tile) Board {
-	nextMoves := make([]boardTile, 0)
+	nextMoves := make([]Tile, 0)
 
-	tiles := make([]boardTile, 0)
-	tiles = append(tiles, newBoardTile(startTile))
+	tiles := make([]Tile, 0)
+	tiles = append(tiles, startTile)
 
 	return Board{
 		screenWidth:  boardSize,
@@ -68,7 +57,7 @@ func (board *Board) MoveBoard(direction rl.Vector2) {
 func (board *Board) NextNewMove(nextTile Tile) {
 	defer board.findTileExtremes()
 
-	board.tiles = append(board.tiles, newBoardTile(nextTile))
+	board.tiles = append(board.tiles, nextTile)
 }
 
 // Replay a move that has already been added, but was undone. Has to be called after PreviousMove()
@@ -78,38 +67,16 @@ func (board *Board) NextMove() {
 	tileIndex := len(board.nextMoves) - 1
 	board.tiles = append(board.tiles, board.nextMoves[tileIndex])
 	board.nextMoves = board.nextMoves[:tileIndex]
-
-	if len(board.nextMoves)-1 >= 0 && board.nextMoves[len(board.nextMoves)-1].skipMove {
-		board.NextMove()
-	}
 }
 
 func (board *Board) PreviousMove() {
 	defer board.findTileExtremes()
 
 	if len(board.tiles) > 1 { // we leave starting tile
-		skipMove := board.tiles[len(board.tiles)-1].skipMove
-
 		tileIndex := len(board.tiles) - 1
 		board.nextMoves = append(board.nextMoves, board.tiles[tileIndex])
 		board.tiles = board.tiles[:tileIndex]
-
-		if skipMove {
-			board.PreviousMove()
-		}
 	}
-}
-
-func (board *Board) ResetTile(position position.Position) {
-	var clearedTile boardTile
-	for _, tile := range board.tiles {
-		if tile.position == position {
-			clearedTile = clone.Clone(tile).(boardTile)
-			clearedTile.ClearCustomColors()
-		}
-	}
-	clearedTile.skipMove = true
-	board.tiles = append(board.tiles, clearedTile)
 }
 
 func (board Board) Draw() {
