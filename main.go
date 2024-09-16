@@ -1,6 +1,10 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	"os"
+
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -11,8 +15,16 @@ const (
 )
 
 func main() {
+	log_filename := os.Args[1]
+
+	if _, err := os.Stat(log_filename); errors.Is(err, os.ErrNotExist) {
+		message := "File " + log_filename + " does not exist."
+		fmt.Println(message)
+		os.Exit(2)
+	}
+
 	game := pkg.Game{}
-	game.Init("test_file.jsonl")
+	game.Init(log_filename)
 
 	rl.InitWindow(screenWidth, screenHeight, "Carcassonne-Visualiser")
 	rl.SetTargetFPS(60)

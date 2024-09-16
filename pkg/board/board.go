@@ -17,6 +17,11 @@ type Board struct {
 	minRange     rl.Vector2
 	maxRange     rl.Vector2
 
+	maxTileX int16
+	minTileX int16
+	maxTileY int16
+	minTileY int16
+
 	nextMoves []Tile
 	tiles     []Tile
 }
@@ -39,12 +44,18 @@ func NewBoard(startTile Tile) Board {
 }
 
 func (board *Board) MoveBoard(direction rl.Vector2) {
-	board.offset = rl.Vector2Add(board.offset, direction)
-	board.minRange = rl.Vector2Subtract(board.minRange, direction)
-	board.maxRange = rl.Vector2Subtract(board.maxRange, direction)
+	newOffset := rl.Vector2Add(board.offset, direction)
+
+	if float32(board.maxTileX)+newOffset.X >= board.minRange.X && float32(board.minTileX)+newOffset.X <= board.maxRange.X &&
+		float32(board.maxTileY)+newOffset.Y >= board.minRange.Y && float32(board.minTileY)+newOffset.Y <= board.maxRange.Y {
+
+		board.offset = newOffset
+	}
 }
 
 func (board *Board) NextMove(nextTile Tile, nextTilePlaced bool) bool {
+	defer board.findTileExtremes()
+
 	if len(board.nextMoves) > 0 {
 		tileIndex := len(board.nextMoves) - 1
 		board.tiles = append(board.tiles, board.nextMoves[tileIndex])
@@ -62,6 +73,7 @@ func (board *Board) PreviousMove() {
 		tileIndex := len(board.tiles) - 1
 		board.nextMoves = append(board.nextMoves, board.tiles[tileIndex])
 		board.tiles = board.tiles[:tileIndex]
+		board.findTileExtremes()
 	}
 }
 
@@ -89,11 +101,42 @@ func (board Board) Draw() {
 	// Draw tiles
 	for _, tile := range board.tiles {
 		// Draw tile only if it is visible
-		if tile.position.X() >= int16(board.minRange.X) && tile.position.X() <= int16(board.maxRange.X) &&
-			tile.position.Y() >= int16(board.minRange.Y) && tile.position.Y() <= int16(board.maxRange.Y) {
+		if tile.position.X()+int16(board.offset.X) >= int16(board.minRange.X) && tile.position.X()+int16(board.offset.X) <= int16(board.maxRange.X) &&
+			tile.position.Y()+int16(board.offset.Y) >= int16(board.minRange.Y) && tile.position.Y()+int16(board.offset.Y) <= int16(board.maxRange.Y) {
 			tile.DrawTile(board.offset)
 		}
 	}
 
 	rl.EndDrawing()
+}
+
+func (board *Board) findTileExtremes() {
+	board.maxTileX, board.minTileX = 0, 0
+	board.maxTileY, board.minTileY = 0, 0
+
+	for _, tile := range board.tiles {
+		if tile.position.X() > board.maxTileX {
+			board.maxTileX = tile.position.X()
+		} else if tile.position.X() < board.minTileX {
+			board.minTileX = tile.position.X()
+		}
+
+		if tile.position.Y() > board.maxTileY {
+			board.maxTileY = tile.position.Y()
+		} else if tile.position.Y() < board.minTileY {
+			board.minTileY = tile.position.Y()
+		}
+	}
+
+	if float32(board.maxTileX)+board.offset.X < board.minRange.X {
+		board.offset.X = board.minRange.X - float32(board.maxTileX)
+	} else if float32(board.minTileX)+board.offset.X > board.maxRange.X {
+		board.offset.X = board.maxRange.X - float32(board.minTileX)
+	}
+
+	if float32(board.maxTileY)+board.offset.Y < board.minRange.Y {
+		board.offset.Y = board.minRange.Y - float32(board.maxTileY)
+	} else if float32(board.minTileY)+board.offset.Y > board.maxRange.Y {
+		board.offset.Y = board.maxRange.Y - float32(board.minTileY)
+	}
 }
