@@ -53,27 +53,29 @@ func (board *Board) MoveBoard(direction rl.Vector2) {
 	}
 }
 
-func (board *Board) NextMove(nextTile Tile, nextTilePlaced bool) bool {
+// Place nextTile on the board
+func (board *Board) NextNewMove(nextTile Tile) {
 	defer board.findTileExtremes()
 
-	if len(board.nextMoves) > 0 {
-		tileIndex := len(board.nextMoves) - 1
-		board.tiles = append(board.tiles, board.nextMoves[tileIndex])
-		board.nextMoves = board.nextMoves[:tileIndex]
-		return false
-	} else if !nextTilePlaced {
-		board.tiles = append(board.tiles, nextTile)
-		return true
-	}
-	return true
+	board.tiles = append(board.tiles, nextTile)
+}
+
+// Replay a move that has already been added, but was undone. Has to be called after PreviousMove()
+func (board *Board) NextMove() {
+	defer board.findTileExtremes()
+
+	tileIndex := len(board.nextMoves) - 1
+	board.tiles = append(board.tiles, board.nextMoves[tileIndex])
+	board.nextMoves = board.nextMoves[:tileIndex]
 }
 
 func (board *Board) PreviousMove() {
+	defer board.findTileExtremes()
+
 	if len(board.tiles) > 1 { // we leave starting tile
 		tileIndex := len(board.tiles) - 1
 		board.nextMoves = append(board.nextMoves, board.tiles[tileIndex])
 		board.tiles = board.tiles[:tileIndex]
-		board.findTileExtremes()
 	}
 }
 
