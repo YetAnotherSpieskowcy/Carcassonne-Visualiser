@@ -107,6 +107,11 @@ func (game *Game) processEntry(entry logger.Entry) {
 
 	} else if entry.Event == logger.ScoreEvent {
 		scoreReport := ParseScoreEntry(entry)
+		for _, meeples := range scoreReport.ReturnedMeeples {
+			for _, meeple := range meeples {
+				game.board.ResetTile(meeple.Position)
+			}
+		}
 		game.scoreInfo.UpdateScores(scoreReport, game.moveCtr+1)
 	} else {
 		panic("only PlaceTileEvent and ScoreEvent entries are currently supported")

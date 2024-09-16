@@ -19,6 +19,14 @@ func New(color rl.Color) Feature {
 	}
 }
 
+func (feature *Feature) SetCustomColor(color rl.Color) {
+	feature.drawable.SetCustomColor(color)
+}
+
+func (feature *Feature) ClearCustomColor() {
+	feature.drawable.ClearCustomColor()
+}
+
 func (feature *Feature) AddRectangle(offsetOnTile rl.Vector2, size rl.Vector2) {
 	feature.drawable.AddRectangle(offsetOnTile, size)
 }

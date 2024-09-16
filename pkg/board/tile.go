@@ -26,11 +26,21 @@ func (tile *Tile) AddFeature(newFeature feature.Feature) {
 	tile.features = append(tile.features, newFeature)
 }
 
+func (tile *Tile) AddFeatureBelowOthers(newFeature feature.Feature) {
+	tile.features = append([]feature.Feature{newFeature}, tile.features...)
+}
+
 func (tile Tile) calculateLocationOnBoard(offset rl.Vector2) rl.Vector2 {
 	location := rl.Vector2{}
 	location.X = float32((boardSize-tileSize)/2 + tile.position.X()*tileSize + int16(offset.X)*tileSize)
 	location.Y = float32((boardSize-tileSize)/2 - tile.position.Y()*tileSize - int16(offset.Y)*tileSize)
 	return location
+}
+
+func (tile *Tile) ClearCustomColors() {
+	for i := range tile.features {
+		tile.features[i].ClearCustomColor()
+	}
 }
 
 func (tile Tile) DrawTile(offset rl.Vector2) {
