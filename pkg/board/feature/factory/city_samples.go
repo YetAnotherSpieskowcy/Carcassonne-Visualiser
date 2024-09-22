@@ -1,13 +1,17 @@
 package factory
 
 import (
+	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/elements"
+	engineModifier "github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/tiles/feature/modifier"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board/feature"
+	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board/feature/meeple"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 var cityColor = rl.NewColor(124, 67, 39, 255)
 
-func TopCity(hasShield bool) feature.Feature {
+func TopCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(20, 15), rl.NewVector2(20, 0)})
@@ -17,11 +21,15 @@ func TopCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(15, 4)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, meeple.RadiusWithMargin), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func BottomCity(hasShield bool) feature.Feature {
+func BottomCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(20, 60), rl.NewVector2(20, 45)})
@@ -31,11 +39,15 @@ func BottomCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(45, 3)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, 60 - meeple.RadiusWithMargin), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func RightCity(hasShield bool) feature.Feature {
+func RightCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(45, 20), rl.NewVector2(60, 20)})
@@ -45,11 +57,15 @@ func RightCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(49, 20)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(60 - meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func LeftCity(hasShield bool) feature.Feature {
+func LeftCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 20), rl.NewVector2(15, 20)})
@@ -59,11 +75,15 @@ func LeftCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(5, 20)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func TopRightCity(hasShield bool) feature.Feature {
+func TopRightCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(20, 10), rl.NewVector2(60, 0)})
@@ -73,11 +93,16 @@ func TopRightCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
 	}
+	if hasMeeple(f) {
+		// TODO: put meeple closer to the center
+		cityFeature.AddMeeple(rl.NewVector2(60 - meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func TopLeftCity(hasShield bool) feature.Feature {
+func TopLeftCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(40, 10), rl.NewVector2(60, 0)})
@@ -87,11 +112,16 @@ func TopLeftCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(10, 5)))
 	}
+	if hasMeeple(f) {
+		// TODO: put meeple closer to the center
+		cityFeature.AddMeeple(rl.NewVector2(meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func BottomRightCity(hasShield bool) feature.Feature {
+func BottomRightCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 60), rl.NewVector2(60, 60), rl.NewVector2(20, 50)})
@@ -101,11 +131,16 @@ func BottomRightCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 50)))
 	}
+	if hasMeeple(f) {
+		// TODO: put meeple closer to the center
+		cityFeature.AddMeeple(rl.NewVector2(60 - meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func BottomLeftCity(hasShield bool) feature.Feature {
+func BottomLeftCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 60), rl.NewVector2(10, 20)})
@@ -115,11 +150,16 @@ func BottomLeftCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(5, 50)))
 	}
+	if hasMeeple(f) {
+		// TODO: put meeple closer to the center
+		cityFeature.AddMeeple(rl.NewVector2(meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func TopBottomCity(hasShield bool) feature.Feature {
+func TopBottomCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(15, 10), rl.NewVector2(15, 0)})
@@ -131,11 +171,15 @@ func TopBottomCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(15, 5)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func LeftRightCity(hasShield bool) feature.Feature {
+func LeftRightCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 15), rl.NewVector2(10, 15)})
@@ -147,11 +191,15 @@ func LeftRightCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(5, 26)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func LeftTopRightCity(hasShield bool) feature.Feature {
+func LeftTopRightCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 45), rl.NewVector2(0, 60), rl.NewVector2(10, 45)})
@@ -161,11 +209,15 @@ func LeftTopRightCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func TopRightBottomCity(hasShield bool) feature.Feature {
+func TopRightBottomCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(15, 10), rl.NewVector2(15, 0)})
@@ -175,11 +227,15 @@ func TopRightBottomCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func RightBottomLeftCity(hasShield bool) feature.Feature {
+func RightBottomLeftCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(0, 0), rl.NewVector2(0, 15), rl.NewVector2(10, 15)})
@@ -189,11 +245,15 @@ func RightBottomLeftCity(hasShield bool) feature.Feature {
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 50)))
 	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+	}
 
 	return cityFeature
 }
 
-func BottomLeftTopCity(hasShield bool) feature.Feature {
+func BottomLeftTopCity(f elements.PlacedFeature) feature.Feature {
+	hasShield := f.ModifierType == engineModifier.Shield
 	cityFeature := feature.New(cityColor)
 
 	cityFeature.AddTriangle([]rl.Vector2{rl.NewVector2(60, 0), rl.NewVector2(45, 0), rl.NewVector2(45, 10)})
@@ -202,6 +262,9 @@ func BottomLeftTopCity(hasShield bool) feature.Feature {
 
 	if hasShield {
 		cityFeature.AddModifier(Shield(rl.NewVector2(10, 5)))
+	}
+	if hasMeeple(f) {
+		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
 	}
 
 	return cityFeature

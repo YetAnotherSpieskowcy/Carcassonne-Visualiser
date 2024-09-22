@@ -18,7 +18,7 @@ func parseFeatures(f elements.PlacedFeature) feature.Feature {
 	} else if f.FeatureType == engineFeature.Road {
 		return factory.Road(f)
 	} else {
-		return factory.City(f.Sides, f.ModifierType == engineModifier.Shield)
+		return factory.City(f)
 	}
 }
 
