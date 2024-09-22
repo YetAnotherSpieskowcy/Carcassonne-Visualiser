@@ -1,6 +1,8 @@
 package board
 
 import (
+	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/elements"
+	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/position"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -24,6 +26,8 @@ type Board struct {
 
 	nextMoves []Tile
 	tiles     []Tile
+
+	hiddenMeeples map[position.Position]struct{}
 }
 
 func NewBoard(startTile Tile) Board {
@@ -33,13 +37,14 @@ func NewBoard(startTile Tile) Board {
 	tiles = append(tiles, startTile)
 
 	return Board{
-		screenWidth:  boardSize,
-		screenHeight: boardSize,
-		minRange:     rl.NewVector2(-6, -6),
-		maxRange:     rl.NewVector2(6, 6),
-		offset:       rl.NewVector2(0, 0),
-		nextMoves:    nextMoves,
-		tiles:        tiles,
+		screenWidth:   boardSize,
+		screenHeight:  boardSize,
+		minRange:      rl.NewVector2(-6, -6),
+		maxRange:      rl.NewVector2(6, 6),
+		offset:        rl.NewVector2(0, 0),
+		nextMoves:     nextMoves,
+		tiles:         tiles,
+		hiddenMeeples: map[position.Position]struct{}{},
 	}
 }
 
@@ -60,18 +65,50 @@ func (board *Board) NextMove(nextTile Tile, nextTilePlaced bool) bool {
 		tileIndex := len(board.nextMoves) - 1
 		board.tiles = append(board.tiles, board.nextMoves[tileIndex])
 		board.nextMoves = board.nextMoves[:tileIndex]
+		board.applyHiddenMeeplesFromCurrentTile()
 		return false
 	} else if !nextTilePlaced {
 		board.tiles = append(board.tiles, nextTile)
+		board.applyHiddenMeeplesFromCurrentTile()
 		return true
 	}
 	return true
+}
+
+func (board *Board) UpdateHidesMeepleAtForCurrentTile(scoreReport elements.ScoreReport) {
+	currentTile := board.tiles[len(board.tiles) - 1]
+
+	for _, meeples := range scoreReport.ReturnedMeeples {
+		for _, meeple := range meeples {
+			currentTile.hidesMeeplesAt = append(currentTile.hidesMeeplesAt, meeple.Position)
+		}
+	}
+
+	board.tiles[len(board.tiles) - 1] = currentTile
+	board.applyHiddenMeeplesFromCurrentTile()
+}
+
+func (board *Board) applyHiddenMeeplesFromCurrentTile() {
+	currentTile := board.tiles[len(board.tiles) - 1]
+
+	for _, pos := range currentTile.hidesMeeplesAt {
+		board.hiddenMeeples[pos] = struct{}{}
+	}
+}
+
+func (board *Board) revertHiddenMeeplesFromCurrentTile() {
+	currentTile := board.tiles[len(board.tiles) - 1]
+
+	for _, pos := range currentTile.hidesMeeplesAt {
+		delete(board.hiddenMeeples, pos)
+	}
 }
 
 func (board *Board) PreviousMove() {
 	if len(board.tiles) > 1 { // we leave starting tile
 		tileIndex := len(board.tiles) - 1
 		board.nextMoves = append(board.nextMoves, board.tiles[tileIndex])
+		board.revertHiddenMeeplesFromCurrentTile()
 		board.tiles = board.tiles[:tileIndex]
 		board.findTileExtremes()
 	}
@@ -103,7 +140,8 @@ func (board Board) Draw() {
 		// Draw tile only if it is visible
 		if tile.position.X()+int16(board.offset.X) >= int16(board.minRange.X) && tile.position.X()+int16(board.offset.X) <= int16(board.maxRange.X) &&
 			tile.position.Y()+int16(board.offset.Y) >= int16(board.minRange.Y) && tile.position.Y()+int16(board.offset.Y) <= int16(board.maxRange.Y) {
-			tile.DrawTile(board.offset)
+			_, hideMeeples := board.hiddenMeeples[tile.position]
+			tile.DrawTile(board.offset, hideMeeples)
 		}
 	}
 

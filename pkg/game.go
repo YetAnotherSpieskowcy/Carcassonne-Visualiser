@@ -63,6 +63,7 @@ func (game *Game) Update(nextMove bool) {
 				} else if entry.Event == logger.ScoreEvent {
 					scoreReport := ParseScoreEntry(entry)
 					game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
+					game.board.UpdateHidesMeepleAtForCurrentTile(scoreReport)
 				}
 			}
 		} else {

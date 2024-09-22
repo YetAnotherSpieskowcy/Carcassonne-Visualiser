@@ -7,10 +7,11 @@ import (
 )
 
 type Tile struct {
-	position    position.Position
-	color       rl.Color
-	borderColor rl.Color
-	features    []feature.Feature
+	position       position.Position
+	color          rl.Color
+	borderColor    rl.Color
+	features       []feature.Feature
+	hidesMeeplesAt []position.Position
 }
 
 func NewTile(pos position.Position, color rl.Color, borderColor rl.Color) Tile {
@@ -33,12 +34,12 @@ func (tile Tile) calculateLocationOnBoard(offset rl.Vector2) rl.Vector2 {
 	return location
 }
 
-func (tile Tile) DrawTile(offset rl.Vector2) {
+func (tile Tile) DrawTile(offset rl.Vector2, hideMeeples bool) {
 	pos := tile.calculateLocationOnBoard(offset)
 	rl.DrawRectangleV(pos, rl.NewVector2(tileSize, tileSize), tile.color)
 
 	for _, f := range tile.features {
-		f.Draw(pos)
+		f.Draw(pos, hideMeeples)
 	}
 
 	rl.DrawRectangleLines(int32(pos.X), int32(pos.Y), tileSize, tileSize, tile.borderColor)

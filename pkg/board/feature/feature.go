@@ -51,12 +51,14 @@ func (feature *Feature) AddMeeple(offsetOnTile rl.Vector2, playerID elements.ID)
 	feature.meeples = append(feature.meeples, meeple)
 }
 
-func (feature Feature) Draw(tilePosition rl.Vector2) {
+func (feature Feature) Draw(tilePosition rl.Vector2, hideMeeples bool) {
 	feature.drawable.Draw(tilePosition)
 	for _, modifier := range feature.modifiers {
 		modifier.Draw(tilePosition)
 	}
-	for _, meeple := range feature.meeples {
-		meeple.Draw(tilePosition)
+	if !hideMeeples {
+		for _, meeple := range feature.meeples {
+			meeple.Draw(tilePosition)
+		}
 	}
 }
