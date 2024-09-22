@@ -32,10 +32,10 @@ var (
 	bottomRoadPosition = rl.NewVector2(25, 35)
 	leftRoadPosition   = rl.NewVector2(0, 25)
 
-	topRoadMeeplePosition    = rl.NewVector2(30, meeple.RadiusWithMargin)
-	rightRoadMeeplePosition  = rl.NewVector2(60 - meeple.RadiusWithMargin, 30)
-	bottomRoadMeeplePosition = rl.NewVector2(30, 60 - meeple.RadiusWithMargin)
-	leftRoadMeeplePosition   = rl.NewVector2(meeple.RadiusWithMargin, 30)
+	topMeeplePosition    = rl.NewVector2(30, meeple.RadiusWithMargin)
+	rightMeeplePosition  = rl.NewVector2(60 - meeple.RadiusWithMargin, 30)
+	bottomMeeplePosition = rl.NewVector2(30, 60 - meeple.RadiusWithMargin)
+	leftMeeplePosition   = rl.NewVector2(meeple.RadiusWithMargin, 30)
 
 	roadConnectorPosition = rl.NewVector2(25, 25)
 
@@ -59,25 +59,25 @@ func Road(f elements.PlacedFeature) feature.Feature {
 			case side.Top:
 				roadFeature.AddRectangle(topRoadPosition, verticalHalfRoadSize)
 				if !meeplePlaced {
-					roadFeature.AddMeeple(topRoadMeeplePosition, f.Meeple.PlayerID)
+					roadFeature.AddMeeple(topMeeplePosition, f.Meeple.PlayerID)
 					meeplePlaced = true
 				}
 			case side.Right:
 				roadFeature.AddRectangle(rightRoadPosition, horizontalHalfRoadSize)
 				if !meeplePlaced {
-					roadFeature.AddMeeple(rightRoadMeeplePosition, f.Meeple.PlayerID)
+					roadFeature.AddMeeple(rightMeeplePosition, f.Meeple.PlayerID)
 					meeplePlaced = true
 				}
 			case side.Bottom:
 				roadFeature.AddRectangle(bottomRoadPosition, verticalHalfRoadSize)
 				if !meeplePlaced {
-					roadFeature.AddMeeple(bottomRoadMeeplePosition, f.Meeple.PlayerID)
+					roadFeature.AddMeeple(bottomMeeplePosition, f.Meeple.PlayerID)
 					meeplePlaced = true
 				}
 			case side.Left:
 				roadFeature.AddRectangle(leftRoadPosition, horizontalHalfRoadSize)
 				if !meeplePlaced {
-					roadFeature.AddMeeple(leftRoadMeeplePosition, f.Meeple.PlayerID)
+					roadFeature.AddMeeple(leftMeeplePosition, f.Meeple.PlayerID)
 					meeplePlaced = true
 				}
 			}
@@ -177,4 +177,62 @@ func City(f elements.PlacedFeature) feature.Feature {
 		return fourEdgeCity(f)
 	}
 	return cityFeature
+}
+
+func Field(f elements.PlacedFeature) feature.Feature {
+	fieldFeature := feature.New(rl.DarkGreen)
+	if !hasMeeple(f) {
+		return fieldFeature
+	}
+
+	s := f.Sides
+
+	for _, edge := range side.PrimarySides {
+		if s&edge != edge {
+			continue
+		}
+
+		switch edge {
+		case side.Top:
+			fieldFeature.AddMeeple(topMeeplePosition, f.Meeple.PlayerID)
+		case side.Right:
+			fieldFeature.AddMeeple(rightMeeplePosition, f.Meeple.PlayerID)
+		case side.Bottom:
+			fieldFeature.AddMeeple(bottomMeeplePosition, f.Meeple.PlayerID)
+		case side.Left:
+			fieldFeature.AddMeeple(leftMeeplePosition, f.Meeple.PlayerID)
+		}
+		return fieldFeature
+	}
+
+	for _, edge := range side.EdgeSides {
+		if s&edge != edge {
+			continue
+		}
+
+		switch edge {
+		case side.TopLeftEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(16, 8), f.Meeple.PlayerID)
+		case side.TopRightEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(60 - 16, 8), f.Meeple.PlayerID)
+
+		case side.BottomLeftEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(16, 60 - 8), f.Meeple.PlayerID)
+		case side.BottomRightEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(60 - 16, 60 - 8), f.Meeple.PlayerID)
+
+		case side.LeftTopEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(8, 16), f.Meeple.PlayerID)
+		case side.LeftBottomEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(8, 60 - 16), f.Meeple.PlayerID)
+
+		case side.RightTopEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(60 - 8, 16), f.Meeple.PlayerID)
+		case side.RightBottomEdge:
+			fieldFeature.AddMeeple(rl.NewVector2(60 - 8, 60 - 16), f.Meeple.PlayerID)
+		}
+		return fieldFeature
+	}
+
+	return fieldFeature
 }
