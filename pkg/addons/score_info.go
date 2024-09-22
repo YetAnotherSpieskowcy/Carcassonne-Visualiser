@@ -74,6 +74,9 @@ func (scoreInfo ScoreInfo) Show(move uint32) {
 		rl.DrawText(text, int32(scoreInfo.position.X), position+int32(id*20), 20, rl.Black)
 	}
 
+	text := "Move " + fmt.Sprint(move)
+	rl.DrawText(text, int32(scoreInfo.position.X+200), position, 20, rl.Black)
+
 	// show returned meeples
 	scoreReport, ok := scoreInfo.scoreReports[move]
 
