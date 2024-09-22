@@ -8,6 +8,11 @@ from typing import Any, Iterator
 
 
 class Side(enum.IntFlag):
+    TOP = 0b1100_0000
+    RIGHT = 0b0011_0000
+    BOTTOM = 0b0000_1100
+    LEFT = 0b0000_0011
+
     TOP_LEFT_EDGE = 0b1000_0000
     TOP_RIGHT_EDGE = 0b0100_0000
     RIGHT_TOP_EDGE = 0b0010_0000
