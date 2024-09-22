@@ -94,8 +94,7 @@ func TopRightCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
 	}
 	if hasMeeple(f) {
-		// TODO: put meeple closer to the center
-		cityFeature.AddMeeple(rl.NewVector2(60 - meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(60 - 18, 18), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
@@ -113,8 +112,7 @@ func TopLeftCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(10, 5)))
 	}
 	if hasMeeple(f) {
-		// TODO: put meeple closer to the center
-		cityFeature.AddMeeple(rl.NewVector2(meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(18, 18), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
@@ -132,8 +130,7 @@ func BottomRightCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 50)))
 	}
 	if hasMeeple(f) {
-		// TODO: put meeple closer to the center
-		cityFeature.AddMeeple(rl.NewVector2(60 - meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(60 - 18, 60 - 18), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
@@ -151,8 +148,7 @@ func BottomLeftCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(5, 50)))
 	}
 	if hasMeeple(f) {
-		// TODO: put meeple closer to the center
-		cityFeature.AddMeeple(rl.NewVector2(meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(18, 60 - 18), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
