@@ -1,14 +1,22 @@
 package factory
 
 import (
+	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/elements"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/tiles/side"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board/feature"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func Monastery() feature.Feature {
+func hasMeeple(f elements.PlacedFeature) bool {
+	return f.Meeple.Type != elements.NoneMeeple
+}
+
+func Monastery(f elements.PlacedFeature) feature.Feature {
 	monasteryFeature := feature.New(rl.Black)
 	monasteryFeature.AddRectangle(rl.NewVector2(20, 20), rl.NewVector2(20, 20))
+	if hasMeeple(f) {
+		monasteryFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+	}
 	return monasteryFeature
 }
 

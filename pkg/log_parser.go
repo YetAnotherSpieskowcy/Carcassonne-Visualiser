@@ -14,7 +14,7 @@ import (
 
 func parseFeatures(f elements.PlacedFeature) feature.Feature {
 	if f.FeatureType == engineFeature.Monastery {
-		return factory.Monastery()
+		return factory.Monastery(f)
 	} else if f.FeatureType == engineFeature.Road {
 		return factory.Road(f.Sides)
 	} else {
