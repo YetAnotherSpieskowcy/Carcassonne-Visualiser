@@ -26,6 +26,11 @@ var (
 	bottomRoadPosition = rl.NewVector2(25, 35)
 	leftRoadPosition   = rl.NewVector2(0, 25)
 
+	topRoadMeeplePosition    = rl.NewVector2(30, meeple.RadiusWithMargin)
+	rightRoadMeeplePosition  = rl.NewVector2(60 - meeple.RadiusWithMargin, 30)
+	bottomRoadMeeplePosition = rl.NewVector2(30, 60 - meeple.RadiusWithMargin)
+	leftRoadMeeplePosition   = rl.NewVector2(meeple.RadiusWithMargin, 30)
+
 	roadConnectorPosition = rl.NewVector2(25, 25)
 
 	roadConnectorSize = rl.NewVector2(10, 10)
@@ -34,23 +39,41 @@ var (
 	horizontalHalfRoadSize = rl.NewVector2(25, 10)
 )
 
-func Road(s side.Side) feature.Feature {
+func Road(f elements.PlacedFeature) feature.Feature {
 	roadFeature := feature.New(rl.DarkGray)
 
 	edgeCtr := 0
 
+	s := f.Sides
+	meeplePlaced := !hasMeeple(f)
 	for _, edge := range side.PrimarySides {
 		if s&edge == edge {
 			edgeCtr++
 			switch edge {
 			case side.Top:
 				roadFeature.AddRectangle(topRoadPosition, verticalHalfRoadSize)
+				if !meeplePlaced {
+					roadFeature.AddMeeple(topRoadMeeplePosition, f.Meeple.PlayerID)
+					meeplePlaced = true
+				}
 			case side.Right:
 				roadFeature.AddRectangle(rightRoadPosition, horizontalHalfRoadSize)
+				if !meeplePlaced {
+					roadFeature.AddMeeple(rightRoadMeeplePosition, f.Meeple.PlayerID)
+					meeplePlaced = true
+				}
 			case side.Bottom:
 				roadFeature.AddRectangle(bottomRoadPosition, verticalHalfRoadSize)
+				if !meeplePlaced {
+					roadFeature.AddMeeple(bottomRoadMeeplePosition, f.Meeple.PlayerID)
+					meeplePlaced = true
+				}
 			case side.Left:
 				roadFeature.AddRectangle(leftRoadPosition, horizontalHalfRoadSize)
+				if !meeplePlaced {
+					roadFeature.AddMeeple(leftRoadMeeplePosition, f.Meeple.PlayerID)
+					meeplePlaced = true
+				}
 			}
 		}
 	}
