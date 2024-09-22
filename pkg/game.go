@@ -40,25 +40,35 @@ func (game *Game) Init(filename string) {
 
 func (game *Game) Update(nextMove bool) {
 	if nextMove {
-		game.moveCtr++
-		readNewEntry := game.board.NextMove(game.nextTile, game.nextTilePlaced)
+		nextTileWasPlaced := game.nextTilePlaced
+		readNewEntry := game.board.NextMove(game.nextTile, nextTileWasPlaced)
 		if readNewEntry {
 			game.nextTilePlaced = true
 			for game.nextTilePlaced {
 				entry, ok := <-game.logs
-				if ok {
-					if entry.Event == logger.PlaceTileEvent {
-						game.nextTile = ParsePlaceTileEntry(entry)
-						game.nextTilePlaced = false
-					} else if entry.Event == logger.ScoreEvent {
-						scoreReport := ParseScoreEntry(entry)
-						game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
+				if !ok {
+					// channel already closed - no further tiles expected
+					if !nextTileWasPlaced {
+						// `Board.NextMove()` may ask for next tile after placing one
+						// to have another one ready but, if the channel is closed,
+						// there won't be another move ever
+						game.moveCtr++
 					}
+					return
+				}
+				if entry.Event == logger.PlaceTileEvent {
+					game.nextTile = ParsePlaceTileEntry(entry)
+					game.nextTilePlaced = false
+				} else if entry.Event == logger.ScoreEvent {
+					scoreReport := ParseScoreEntry(entry)
+					game.scoreInfo.UpdateScores(scoreReport, game.moveCtr)
 				}
 			}
 		} else {
+			// move was already in cache, the scores just need to be updated
 			game.scoreInfo.NextScores(game.moveCtr)
 		}
+		game.moveCtr++
 	} else if game.moveCtr > 0 {
 		game.board.PreviousMove()
 		game.scoreInfo.PreviousScores(game.moveCtr)
