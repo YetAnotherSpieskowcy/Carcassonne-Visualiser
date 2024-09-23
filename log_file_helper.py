@@ -33,7 +33,7 @@ def decode_content() -> None:
 
     with open(output_file, "w", encoding="utf-8") as fp:
         for data in iter_decoded(input_file):
-            fp.write(json.dumps(data))
+            fp.write(_to_json(data))
             fp.write("\n")
 
 
@@ -69,8 +69,12 @@ def transform() -> None:
 
 def encode(data: dict[str, Any]) -> str:
     data = data.copy()
-    data["content"] = base64.b64encode(json.dumps(data["content"]).encode()).decode()
-    return f"{json.dumps(data)}\n"
+    data["content"] = base64.b64encode(_to_json(data["content"]).encode()).decode()
+    return f"{_to_json(data)}\n"
+
+
+def _to_json(data: dict[str, Any]) -> str:
+    return json.dumps(data, separators=(",", ":"))
 
 
 def iter_decoded(path: os.PathLike[str] | str) -> Iterator[dict[str, Any]]:
