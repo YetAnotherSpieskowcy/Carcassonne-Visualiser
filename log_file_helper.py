@@ -6,6 +6,10 @@ import os
 import sys
 from typing import Any, Iterator
 
+EVENT_START = "start"
+EVENT_PLACE_TILE = "place"
+EVENT_SCORE = "score"
+
 
 class Side(enum.IntFlag):
     TOP = 0b1100_0000
@@ -78,12 +82,27 @@ def iter_decoded(path: os.PathLike[str] | str) -> Iterator[dict[str, Any]]:
 
 
 def add_meeples_everywhere_transform(data: dict[str, Any]) -> bool:
-    if data["event"] == "score":
+    if data["event"] == EVENT_SCORE:
         return False
-    if data["event"] == "place":
+    if data["event"] == EVENT_PLACE_TILE:
         for idx, feature in enumerate(data["content"]["move"]["Features"], start=1):
-            feature["Type"] = 1
-            feature["PlayerID"] = idx
+            meeple = feature["Meeple"]
+            meeple["Type"] = 1
+            meeple["PlayerID"] = idx
+    return True
+
+
+# Log V1 was based on v0.0.0-20240902151828-926a89e4df8c.
+# Log V2 has been introduced by v0.0.0-20240908171157-2f353db5fffb.
+# No further changes have been made to the log as of v0.0.0-20240923073901-5669151e0436.
+def convert_log_v1_to_v2(data: dict[str, Any]) -> bool:
+    if data["event"] != EVENT_PLACE_TILE:
+        return True
+    for idx, feature in enumerate(data["content"]["move"]["Features"], start=1):
+        feature["Meeple"] = {
+            "Type": feature.pop("Type"),
+            "PlayerID": feature.pop("PlayerID"),
+        }
     return True
 
 
@@ -95,6 +114,7 @@ COMMANDS = {
 }
 TRANSFORMS = {
     "add-meeples-everywhere": add_meeples_everywhere_transform,
+    "convert-log-v1-to-v2": convert_log_v1_to_v2,
 }
 
 
