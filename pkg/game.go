@@ -40,6 +40,7 @@ func (game *Game) Init(filename string) {
 
 func (game *Game) Update(nextMove bool) {
 	if nextMove {
+		game.moveCtr++
 		nextTileWasPlaced := game.nextTilePlaced
 		readNewEntry := game.board.NextMove(game.nextTile, nextTileWasPlaced)
 		if readNewEntry {
@@ -48,11 +49,11 @@ func (game *Game) Update(nextMove bool) {
 				entry, ok := <-game.logs
 				if !ok {
 					// channel already closed - no further tiles expected
-					if !nextTileWasPlaced {
+					if nextTileWasPlaced {
 						// `Board.NextMove()` may ask for next tile after placing one
 						// to have another one ready but, if the channel is closed,
 						// there won't be another move ever
-						game.moveCtr++
+						game.moveCtr--
 					}
 					return
 				}
@@ -68,7 +69,6 @@ func (game *Game) Update(nextMove bool) {
 			// move was already in cache, the scores just need to be updated
 			game.scoreInfo.NextScores(game.moveCtr)
 		}
-		game.moveCtr++
 	} else if game.moveCtr > 0 {
 		game.board.PreviousMove()
 		game.scoreInfo.PreviousScores(game.moveCtr)
