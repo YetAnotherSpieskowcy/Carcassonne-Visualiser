@@ -5,7 +5,6 @@ import (
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/game/position"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/logger"
 	engineFeature "github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/tiles/feature"
-	engineModifier "github.com/YetAnotherSpieskowcy/Carcassonne-Engine/pkg/tiles/feature/modifier"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board/feature"
 	"github.com/YetAnotherSpieskowcy/Carcassonne-Visualiser/pkg/board/feature/factory"
@@ -14,11 +13,15 @@ import (
 
 func parseFeatures(f elements.PlacedFeature) feature.Feature {
 	if f.FeatureType == engineFeature.Monastery {
-		return factory.Monastery()
+		return factory.Monastery(f)
 	} else if f.FeatureType == engineFeature.Road {
-		return factory.Road(f.Sides)
+		return factory.Road(f)
+	} else if f.FeatureType == engineFeature.City {
+		return factory.City(f)
+	} else if f.FeatureType == engineFeature.Field {
+		return factory.Field(f)
 	} else {
-		return factory.City(f.Sides, f.ModifierType == engineModifier.Shield)
+		panic("unknown feature type")
 	}
 }
 
@@ -30,9 +33,7 @@ func ParseStartEntry(entry logger.Entry) (board.Tile, int) {
 	tile := board.NewTile(position.New(0, 0), rl.DarkGreen, rl.Red)
 
 	for _, f := range placedStartTile.Features {
-		if f.FeatureType != engineFeature.Field {
-			tile.AddFeature(parseFeatures(f))
-		}
+		tile.AddFeature(parseFeatures(f))
 	}
 
 	return tile, startContent.PlayerCount
@@ -44,9 +45,7 @@ func ParsePlaceTileEntry(entry logger.Entry) board.Tile {
 	tile := board.NewTile(placedTileContent.Move.Position, rl.DarkGreen, rl.LightGray)
 
 	for _, f := range placedTileContent.Move.Features {
-		if f.FeatureType != engineFeature.Field {
-			tile.AddFeature(parseFeatures(f))
-		}
+		tile.AddFeature(parseFeatures(f))
 	}
 
 	return tile
