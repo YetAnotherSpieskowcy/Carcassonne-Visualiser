@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import base64
 import enum
 import itertools
@@ -30,43 +31,6 @@ class Side(enum.IntFlag):
     LEFT_TOP_EDGE = 0b0000_0001
 
 
-def decode_content() -> None:
-    input_file = sys.argv[2]
-    output_file = sys.argv[3]
-
-    with open(output_file, "w", encoding="utf-8") as fp:
-        for data in iter_decoded(input_file):
-            fp.write(_to_json(data))
-            fp.write("\n")
-
-
-def encode_content() -> None:
-    input_file = sys.argv[2]
-    output_file = sys.argv[3]
-
-    with (
-        open(input_file, "r", encoding="utf-8") as fp_input,
-        open(output_file, "w", encoding="utf-8") as fp_output,
-    ):
-        for line in fp_input:
-            fp_output.write(encode(json.loads(line)))
-
-
-def decode_sides() -> None:
-    for line in sys.stdin:
-        print(Side(int(line.strip())))
-
-
-def transform() -> None:
-    input_file = sys.argv[2]
-    output_file = sys.argv[3]
-    transform_name = sys.argv[4]
-    transformer = TRANSFORMS[transform_name]()
-
-    with open(output_file, "w", encoding="utf-8") as fp:
-        transformer.transform_file(iter_decoded(input_file), fp)
-
-
 def encode(data: _JsonObj) -> str:
     data = data.copy()
     data["content"] = base64.b64encode(_to_json(data["content"]).encode()).decode()
@@ -77,12 +41,11 @@ def _to_json(data: _JsonObj) -> str:
     return json.dumps(data, separators=(",", ":"))
 
 
-def iter_decoded(path: os.PathLike[str] | str) -> Iterable[_JsonObj]:
-    with open(path, "r", encoding="utf-8") as fp:
-        for line in fp:
-            data = json.loads(line)
-            data["content"] = json.loads(base64.b64decode(data["content"]))
-            yield data
+def iter_decoded(fp: TextIO) -> Iterable[_JsonObj]:
+    for line in fp:
+        data = json.loads(line)
+        data["content"] = json.loads(base64.b64decode(data["content"]))
+        yield data
 
 
 class Transformer:
@@ -160,22 +123,84 @@ class LogV2ToLogV2_1Transformer(Transformer):
         }
 
 
-COMMANDS = {
-    "decode-content": decode_content,
-    "encode-content": encode_content,
-    "transform": transform,
-    "decode-sides": decode_sides,
-}
-TRANSFORMS = {
-    "add-meeples-everywhere": AddMeeplesEverywhereTransformer,
-    "convert-log-v1-to-v2": LogV1ToLogV2Transformer,
-    "convert-log-v2-to-v2.1": LogV2ToLogV2_1Transformer,
-}
+class App:
+    _TRANSFORMS = {
+        "add-meeples-everywhere": AddMeeplesEverywhereTransformer,
+        "convert-log-v1-to-v2": LogV1ToLogV2Transformer,
+        "convert-log-v2-to-v2.1": LogV2ToLogV2_1Transformer,
+    }
+
+    def __init__(self) -> None:
+        self._args = argparse.Namespace()
+
+    def run(self) -> None:
+        self._args = self._parse_args()
+        self._args.func()
+
+    def _parse_args(self) -> argparse.Namespace:
+        parser = argparse.ArgumentParser(
+            description=(
+                "A bunch of utilities for working on Carcassonne-Engine log files."
+            ),
+        )
+
+        subparsers = parser.add_subparsers()
+        decode_content = subparsers.add_parser("decode-content")
+        self._add_io_arguments(decode_content)
+        decode_content.set_defaults(func=self.decode_content)
+
+        encode_content = subparsers.add_parser("encode-content")
+        self._add_io_arguments(encode_content)
+        encode_content.set_defaults(func=self.encode_content)
+
+        decode_sides = subparsers.add_parser("decode-sides")
+        decode_sides.set_defaults(func=self.decode_sides)
+
+        transform = subparsers.add_parser("transform")
+        self._add_io_arguments(transform)
+        transform.add_argument("transform_name", choices=self._TRANSFORMS.keys())
+        transform.set_defaults(func=self.transform)
+
+        return parser.parse_args()
+
+    def _add_io_arguments(self, parser: argparse.ArgumentParser) -> None:
+        parser.add_argument(
+            "input_file", type=argparse.FileType("r", encoding="utf-8"),
+        )
+        parser.add_argument(
+            "output_file", nargs="?", type=argparse.FileType("w", encoding="utf-8"), default="-"
+        )
+
+    def decode_content(self) -> None:
+        with self._args.output_file as fp:
+            for data in iter_decoded(self._args.input_file):
+                fp.write(_to_json(data))
+                fp.write("\n")
+
+    def encode_content(self) -> None:
+        with (
+            self._args.input_file as fp_input,
+            self._args.output_file as fp_output,
+        ):
+            for line in fp_input:
+                fp_output.write(encode(json.loads(line)))
+
+
+    def decode_sides(self) -> None:
+        for line in sys.stdin:
+            print(Side(int(line.strip())))
+
+
+    def transform(self) -> None:
+        transformer = self._TRANSFORMS[self._args.transform_name]()
+
+        with self._args.output_file as fp:
+            transformer.transform_file(iter_decoded(self._args.input_file), fp)
 
 
 def main() -> None:
-    cmd_name = sys.argv[1]
-    COMMANDS[cmd_name]()
+    app = App()
+    app.run()
 
 
 if __name__ == "__main__":
