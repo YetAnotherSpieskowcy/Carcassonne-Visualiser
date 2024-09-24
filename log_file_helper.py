@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 import base64
 import enum
+import itertools
 import json
 import os
 import sys
-from typing import Any, Iterator
+from typing import Any, Iterable, TextIO
 
 EVENT_START = "start"
 EVENT_PLACE_TILE = "place"
 EVENT_SCORE = "score"
+_JsonObj = dict[str, Any]
 
 
 class Side(enum.IntFlag):
@@ -57,27 +59,24 @@ def decode_sides() -> None:
 def transform() -> None:
     input_file = sys.argv[2]
     output_file = sys.argv[3]
-    transform_func_name = sys.argv[4]
+    transform_name = sys.argv[4]
+    transformer = TRANSFORMS[transform_name]()
 
     with open(output_file, "w", encoding="utf-8") as fp:
-        for data in iter_decoded(input_file):
-            transform_func = TRANSFORMS[transform_func_name]
-
-            if transform_func(data):
-                fp.write(encode(data))
+        transformer.transform_file(iter_decoded(input_file), fp)
 
 
-def encode(data: dict[str, Any]) -> str:
+def encode(data: _JsonObj) -> str:
     data = data.copy()
     data["content"] = base64.b64encode(_to_json(data["content"]).encode()).decode()
     return f"{_to_json(data)}\n"
 
 
-def _to_json(data: dict[str, Any]) -> str:
+def _to_json(data: _JsonObj) -> str:
     return json.dumps(data, separators=(",", ":"))
 
 
-def iter_decoded(path: os.PathLike[str] | str) -> Iterator[dict[str, Any]]:
+def iter_decoded(path: os.PathLike[str] | str) -> Iterable[_JsonObj]:
     with open(path, "r", encoding="utf-8") as fp:
         for line in fp:
             data = json.loads(line)
@@ -85,29 +84,44 @@ def iter_decoded(path: os.PathLike[str] | str) -> Iterator[dict[str, Any]]:
             yield data
 
 
-def add_meeples_everywhere_transform(data: dict[str, Any]) -> bool:
-    if data["event"] == EVENT_SCORE:
-        return False
-    if data["event"] == EVENT_PLACE_TILE:
-        for idx, feature in enumerate(data["content"]["move"]["Features"], start=1):
-            meeple = feature["Meeple"]
-            meeple["Type"] = 1
-            meeple["PlayerID"] = idx
-    return True
+class Transformer:
+    def transform_event(self, data: _JsonObj) -> Iterable[_JsonObj]:
+        return [data]
+
+    def transform_log(self, decoded_events: Iterable[_JsonObj]) -> Iterable[_JsonObj]:
+        for data in decoded_events:
+            yield from self.transform_event(data)
+
+    def transform_file(self, decoded_events: Iterable[_JsonObj], fp: TextIO) -> None:
+        for transformed in self.transform_log(decoded_events):
+            fp.write(encode(transformed))
+
+
+class AddMeeplesEverywhereTransformer(Transformer):
+    def transform_event(self, data: _JsonObj) -> Iterable[_JsonObj]:
+        if data["event"] == EVENT_SCORE:
+            return []
+        if data["event"] == EVENT_PLACE_TILE:
+            for idx, feature in enumerate(data["content"]["move"]["Features"], start=1):
+                meeple = feature["Meeple"]
+                meeple["Type"] = 1
+                meeple["PlayerID"] = idx
+        return [data]
 
 
 # Log V1 was based on v0.0.0-20240902151828-926a89e4df8c.
 # Log V2 has been introduced by v0.0.0-20240908171157-2f353db5fffb.
 # No further changes have been made to the log as of v0.0.0-20240923073901-5669151e0436.
-def convert_log_v1_to_v2(data: dict[str, Any]) -> bool:
-    if data["event"] != EVENT_PLACE_TILE:
-        return True
-    for idx, feature in enumerate(data["content"]["move"]["Features"], start=1):
-        feature["Meeple"] = {
-            "Type": feature.pop("Type"),
-            "PlayerID": feature.pop("PlayerID"),
-        }
-    return True
+class LogV1ToLogV2Transformer(Transformer):
+    def transform_event(self, data: _JsonObj) -> Iterable[_JsonObj]:
+        if data["event"] != EVENT_PLACE_TILE:
+            return [data]
+        for idx, feature in enumerate(data["content"]["move"]["Features"], start=1):
+            feature["Meeple"] = {
+                "Type": feature.pop("Type"),
+                "PlayerID": feature.pop("PlayerID"),
+            }
+        return [data]
 
 
 COMMANDS = {
@@ -117,8 +131,8 @@ COMMANDS = {
     "decode-sides": decode_sides,
 }
 TRANSFORMS = {
-    "add-meeples-everywhere": add_meeples_everywhere_transform,
-    "convert-log-v1-to-v2": convert_log_v1_to_v2,
+    "add-meeples-everywhere": AddMeeplesEverywhereTransformer,
+    "convert-log-v1-to-v2": LogV1ToLogV2Transformer,
 }
 
 
