@@ -10,6 +10,7 @@ from typing import Any, Iterable, TextIO
 EVENT_START = "start"
 EVENT_PLACE_TILE = "place"
 EVENT_SCORE = "score"
+EVENT_FINAL_SCORE = "final_score"
 _JsonObj = dict[str, Any]
 
 
@@ -111,7 +112,8 @@ class AddMeeplesEverywhereTransformer(Transformer):
 
 # Log V1 was based on v0.0.0-20240902151828-926a89e4df8c.
 # Log V2 has been introduced by v0.0.0-20240908171157-2f353db5fffb.
-# No further changes have been made to the log as of v0.0.0-20240923073901-5669151e0436.
+# Log V2.1 has been introduced by v0.0.0-20240924143151-8da9e28521f9.
+# No further changes have been made to the log as of v0.0.0-20240924143944-1a1d6e31de89.
 class LogV1ToLogV2Transformer(Transformer):
     def transform_event(self, data: _JsonObj) -> Iterable[_JsonObj]:
         if data["event"] != EVENT_PLACE_TILE:
@@ -124,6 +126,40 @@ class LogV1ToLogV2Transformer(Transformer):
         return [data]
 
 
+class LogV2ToLogV2_1Transformer(Transformer):
+    def __init__(self) -> None:
+        self._totals = {}
+        self._player_count = 0
+        self._last_returned_meeples = {}
+
+    def transform_event(self, data: _JsonObj) -> Iterable[_JsonObj]:
+        content = data["content"]
+        if data["event"] == EVENT_PLACE_TILE:
+            self._last_returned_meeples = {}
+        elif data["event"] == EVENT_SCORE:
+            scores = content["scores"]
+            self._last_returned_meeples = scores["ReturnedMeeples"]
+            for player_id, received_points in scores["ReceivedPoints"].items():
+                old_total = self._totals.setdefault(str(player_id))
+                self._totals[str(player_id)] = old_total + received_points
+        elif data["event"] == EVENT_START:
+            for player_id in range(1, content["playerCount"] + 1):
+                self._totals.setdefault(str(player_id), 0)
+        return [data]
+
+    def transform_log(self, decoded_events: Iterable[_JsonObj]) -> Iterable[_JsonObj]:
+        yield from super().transform_log(decoded_events)
+        yield {
+            "event": EVENT_FINAL_SCORE,
+            "content": {
+                "scores": {
+                    "ReceivedPoints": self._totals,
+                    "ReturnedMeeples": self._last_returned_meeples,
+                }
+            }
+        }
+
+
 COMMANDS = {
     "decode-content": decode_content,
     "encode-content": encode_content,
@@ -133,6 +169,7 @@ COMMANDS = {
 TRANSFORMS = {
     "add-meeples-everywhere": AddMeeplesEverywhereTransformer,
     "convert-log-v1-to-v2": LogV1ToLogV2Transformer,
+    "convert-log-v2-to-v2.1": LogV2ToLogV2_1Transformer,
 }
 
 
