@@ -206,7 +206,7 @@ func LeftTopRightCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
 	}
 	if hasMeeple(f) {
-		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(30, meeple.RadiusWithMargin), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
@@ -224,7 +224,7 @@ func TopRightBottomCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 5)))
 	}
 	if hasMeeple(f) {
-		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(60-meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
@@ -242,7 +242,7 @@ func RightBottomLeftCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(50, 50)))
 	}
 	if hasMeeple(f) {
-		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(30, 60-meeple.RadiusWithMargin), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
@@ -260,7 +260,7 @@ func BottomLeftTopCity(f elements.PlacedFeature) feature.Feature {
 		cityFeature.AddModifier(Shield(rl.NewVector2(10, 5)))
 	}
 	if hasMeeple(f) {
-		cityFeature.AddMeeple(rl.NewVector2(30, 30), f.Meeple.PlayerID)
+		cityFeature.AddMeeple(rl.NewVector2(meeple.RadiusWithMargin, 30), f.Meeple.PlayerID)
 	}
 
 	return cityFeature
